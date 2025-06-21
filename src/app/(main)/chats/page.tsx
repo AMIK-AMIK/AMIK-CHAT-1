@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { db } from '@/lib/firebase';
-import { collection, query, where, onSnapshot, doc, getDoc, orderBy, limit } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, doc, getDoc, orderBy, limit, getDocs } from 'firebase/firestore';
 import type { Chat, User, Message } from '@/lib/types';
 import { currentUserId } from '@/lib/data';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -15,17 +15,19 @@ import { formatDistanceToNow } from 'date-fns';
 
 function ChatItem({ chat }: { chat: Chat }) {
   const otherParticipant = chat.participants.find(p => p.id !== currentUserId);
+  const [time, setTime] = useState('');
+
+  useEffect(() => {
+    if (chat.lastMessage?.timestamp) {
+      try {
+        setTime(formatDistanceToNow(chat.lastMessage.timestamp.toDate(), { addSuffix: true }));
+      } catch (e) {
+        setTime('just now');
+      }
+    }
+  }, [chat.lastMessage?.timestamp]);
 
   if (!otherParticipant) return null;
-
-  const getTimestamp = () => {
-    if (!chat.lastMessage?.timestamp) return '';
-    try {
-      return formatDistanceToNow(chat.lastMessage.timestamp.toDate(), { addSuffix: true });
-    } catch (e) {
-      return 'just now';
-    }
-  }
 
   return (
     <Link href={`/chats/${chat.id}`} className="block transition-colors hover:bg-muted/50">
@@ -37,7 +39,7 @@ function ChatItem({ chat }: { chat: Chat }) {
         <div className="flex-1 overflow-hidden">
           <div className="flex justify-between items-center">
             <p className="font-semibold truncate text-base">{otherParticipant.name}</p>
-            {chat.lastMessage && <p className="text-xs text-muted-foreground">{getTimestamp()}</p>}
+            {chat.lastMessage && <p className="text-xs text-muted-foreground">{time}</p>}
           </div>
           <p className="text-sm text-muted-foreground truncate">{chat.lastMessage?.text || 'No messages yet'}</p>
         </div>
@@ -71,8 +73,8 @@ export default function ChatsPage() {
 
           // Get last message
           const messagesQuery = query(collection(db, `chats/${chatDoc.id}/messages`), orderBy('timestamp', 'desc'), limit(1));
-          const messagesSnapshot = await getDoc(messagesQuery as any);
-          const lastMessage = messagesSnapshot.docs.map(d => ({id: d.id, ...d.data()}))[0] as Message | null;
+          const messagesSnapshot = await getDocs(messagesQuery);
+          const lastMessage = messagesSnapshot.empty ? null : {id: messagesSnapshot.docs[0].id, ...messagesSnapshot.docs[0].data()} as Message;
 
           return {
             id: chatDoc.id,
@@ -82,6 +84,13 @@ export default function ChatsPage() {
           };
         })
       );
+      
+      chatsData.sort((a, b) => {
+        const timeA = a.lastMessage?.timestamp?.toDate()?.getTime() || 0;
+        const timeB = b.lastMessage?.timestamp?.toDate()?.getTime() || 0;
+        return timeB - timeA;
+      });
+
       setChats(chatsData);
       setLoading(false);
     });
