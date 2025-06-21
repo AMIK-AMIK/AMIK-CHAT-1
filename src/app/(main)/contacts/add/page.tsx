@@ -25,43 +25,63 @@ export default function AddContactPage() {
     if (!contactId.trim() || loading || !currentUser) return;
 
     setLoading(true);
+    const trimmedId = contactId.trim();
 
     try {
-      if (contactId.trim() === currentUser.uid) {
-         toast({
+      if (trimmedId === currentUser.uid) {
+        toast({
           variant: 'destructive',
           title: 'Error',
           description: "You cannot add yourself as a contact.",
         });
+        setLoading(false);
         return;
       }
       
-      const userDocRef = doc(db, 'users', contactId.trim());
+      const userDocRef = doc(db, 'users', trimmedId);
       const userDoc = await getDoc(userDocRef);
 
       if (!userDoc.exists()) {
         toast({
           variant: 'destructive',
-          title: 'Error',
-          description: 'User not found. Please check the ID.',
+          title: 'User Not Found',
+          description: 'No user exists with that ID. Please check and try again.',
         });
+        setLoading(false);
         return;
       }
+      
+      const contactData = userDoc.data();
 
-      const contactRef = doc(db, 'users', currentUser.uid, 'contacts', contactId.trim());
+      // Check if contact already exists
+      const existingContactRef = doc(db, 'users', currentUser.uid, 'contacts', trimmedId);
+      const existingContactSnap = await getDoc(existingContactRef);
+
+      if (existingContactSnap.exists()) {
+          toast({
+              title: 'Already a Contact',
+              description: `${contactData.name} is already in your contacts.`,
+          });
+          setContactId('');
+          router.push('/contacts');
+          return;
+      }
+
+
+      const contactRef = doc(db, 'users', currentUser.uid, 'contacts', trimmedId);
       await setDoc(contactRef, {
         addedAt: new Date(),
       });
 
       // Also add current user to the other person's contact list
-      const currentUserAsContactRef = doc(db, 'users', contactId.trim(), 'contacts', currentUser.uid);
+      const currentUserAsContactRef = doc(db, 'users', trimmedId, 'contacts', currentUser.uid);
       await setDoc(currentUserAsContactRef, {
         addedAt: new Date(),
       });
 
       toast({
         title: 'Success!',
-        description: `${userDoc.data().name} has been added to your contacts.`,
+        description: `${contactData.name} has been added to your contacts.`,
       });
       router.push('/contacts');
 
@@ -70,7 +90,7 @@ export default function AddContactPage() {
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'Something went wrong. Please try again.',
+        description: 'Something went wrong while adding the contact. Please try again.',
       });
     } finally {
       setLoading(false);
@@ -90,7 +110,7 @@ export default function AddContactPage() {
           <CardHeader>
             <CardTitle>Add a New Contact</CardTitle>
             <CardDescription>
-              Enter the AMIK CHAT ID of the user you want to add.
+              Enter the unique AMIK CHAT ID of the user you want to add.
             </CardDescription>
           </CardHeader>
           <form onSubmit={handleAddContact}>

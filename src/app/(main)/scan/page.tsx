@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, VideoOff, Loader2 } from 'lucide-react';
@@ -21,6 +21,85 @@ export default function ScanPage() {
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
+  const handleScannedCode = useCallback(async (code: string) => {
+    if (isProcessing || !currentUser) return;
+    setIsProcessing(true);
+
+    if (scannerRef.current?.isScanning) {
+        try {
+            await scannerRef.current.stop();
+        } catch (err) {
+            console.error("Error stopping scanner:", err);
+        }
+    }
+
+    if (!code.startsWith('amik-chat-user://')) {
+        toast({
+            variant: 'destructive',
+            title: 'Invalid QR Code',
+            description: 'This is not a valid AMIK CHAT QR code.',
+        });
+        router.back();
+        return;
+    }
+
+    const contactId = code.replace('amik-chat-user://', '');
+
+    if (contactId === currentUser.uid) {
+        toast({
+            title: "That's you!",
+            description: "You can't add yourself as a contact.",
+        });
+        router.back();
+        return;
+    }
+
+    try {
+        const userDocRef = doc(db, 'users', contactId);
+        const userDoc = await getDoc(userDocRef);
+
+        if (!userDoc.exists()) {
+            toast({ variant: 'destructive', title: 'User Not Found', description: 'This QR code is not linked to a valid user.' });
+            router.back();
+            return;
+        }
+
+        const contactData = userDoc.data();
+
+        const existingContactRef = doc(db, 'users', currentUser.uid, 'contacts', contactId);
+        const existingContactSnap = await getDoc(existingContactRef);
+        if (existingContactSnap.exists()) {
+            toast({
+                title: 'Already a Contact',
+                description: `${contactData.name} is already in your contacts.`,
+            });
+            router.push('/contacts');
+            return;
+        }
+
+        const contactDocRef = doc(db, 'users', currentUser.uid, 'contacts', contactId);
+        await setDoc(contactDocRef, { addedAt: new Date() });
+
+        const currentUserAsContactRef = doc(db, 'users', contactId, 'contacts', currentUser.uid);
+        await setDoc(currentUserAsContactRef, { addedAt: new Date() });
+
+        toast({
+            title: 'Contact Added!',
+            description: `You and ${contactData.name} are now contacts.`,
+        });
+        router.push('/contacts');
+
+    } catch (error) {
+        console.error("Error adding contact from QR code:", error);
+        toast({
+            variant: 'destructive',
+            title: 'Error',
+            description: 'Something went wrong. Please try again.',
+        });
+        router.back();
+    }
+  }, [currentUser, isProcessing, router, toast]);
+
   useEffect(() => {
     if (!readerRef.current || scannerRef.current) return;
 
@@ -36,7 +115,7 @@ export default function ScanPage() {
             return;
         }
 
-        qrScanner.start(
+        await qrScanner.start(
           { facingMode: 'environment' },
           {
             fps: 10,
@@ -44,20 +123,13 @@ export default function ScanPage() {
             rememberLastUsedCamera: true,
           },
           (decodedText, _decodedResult) => {
-            if (!isProcessing) {
-                handleScannedCode(decodedText);
-            }
+            handleScannedCode(decodedText);
           },
           (errorMessage) => {
             // parse error, ignore it.
           }
-        ).then(() => {
-            setIsScanning(true);
-        }).catch(err => {
-            console.error("Scanner start error:", err);
-            setHasCameraPermission(false);
-            toast({ variant: 'destructive', title: 'Scanner Error', description: 'Could not start the camera scanner.' });
-        });
+        )
+        setIsScanning(true);
 
       } catch (error) {
         console.error('Error accessing camera:', error);
@@ -69,77 +141,12 @@ export default function ScanPage() {
 
     return () => {
       const qrScanner = scannerRef.current;
-      if (qrScanner && qrScanner.getState() === Html5QrcodeScannerState.SCANNING) {
+      if (qrScanner && qrScanner.isScanning) {
         qrScanner.stop().catch(err => console.error("Error stopping scanner:", err));
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [readerRef, isProcessing]);
+  }, [readerRef, handleScannedCode]);
 
-
-  const handleScannedCode = async (code: string) => {
-    if (!currentUser) return;
-
-    setIsProcessing(true);
-    if (scannerRef.current?.isScanning) {
-        scannerRef.current.stop();
-    }
-    
-    if (!code.startsWith('amik-chat-user://')) {
-      toast({
-        variant: 'destructive',
-        title: 'Invalid QR Code',
-        description: 'This is not a valid AMIK CHAT QR code.',
-      });
-      router.push('/chats');
-      return;
-    }
-
-    const contactId = code.replace('amik-chat-user://', '');
-
-    if (contactId === currentUser.uid) {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: "You cannot add yourself as a contact.",
-      });
-      router.push('/chats');
-      return;
-    }
-
-    try {
-      const userDocRef = doc(db, 'users', contactId);
-      const userDoc = await getDoc(userDocRef);
-
-      if (!userDoc.exists()) {
-        toast({ variant: 'destructive', title: 'Error', description: 'User not found.' });
-        router.push('/chats');
-        return;
-      }
-      
-      const contactRef = doc(db, 'users', currentUser.uid, 'contacts', contactId);
-      await setDoc(contactRef, { addedAt: new Date() });
-
-      const currentUserAsContactRef = doc(db, 'users', contactId, 'contacts', currentUser.uid);
-      await setDoc(currentUserAsContactRef, { addedAt: new Date() });
-
-      toast({
-        title: 'Success!',
-        description: `${userDoc.data().name} has been added to your contacts.`,
-      });
-      router.push('/contacts');
-    } catch (error) {
-      console.error("Error adding contact from QR code:", error);
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Something went wrong. Please try again.',
-      });
-      router.push('/chats');
-    } finally {
-        setIsProcessing(false);
-    }
-  };
 
   return (
     <div className="flex h-screen flex-col bg-black">
@@ -168,12 +175,12 @@ export default function ScanPage() {
         {isProcessing && (
           <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center text-white">
             <Loader2 className="h-16 w-16 animate-spin mb-4" />
-            <p>Adding contact...</p>
+            <p>Processing...</p>
           </div>
         )}
         
         {!isProcessing && <p className="mt-4 text-center text-white">
-          {isScanning ? 'Place a QR code inside the frame to scan it.' : 'Initializing scanner...'}
+          {hasCameraPermission === null ? 'Initializing scanner...' : isScanning ? 'Place a QR code inside the frame to scan it.' : 'Waiting for camera...'}
         </p>}
       </main>
     </div>
