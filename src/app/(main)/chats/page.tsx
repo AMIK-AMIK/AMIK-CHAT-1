@@ -4,6 +4,8 @@ import Link from "next/link";
 import type { Chat } from "@/lib/types";
 import { PlusCircle, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 function ChatItem({ chat }: { chat: Chat }) {
   const otherParticipant = chat.participants.find(p => p.id !== currentUser.id);
@@ -22,7 +24,7 @@ function ChatItem({ chat }: { chat: Chat }) {
             <AvatarFallback>{otherParticipant.name.charAt(0)}</AvatarFallback>
           </Avatar>
           {unreadCount > 0 && (
-            <span className="absolute top-0 right-0 flex h-5 w-5 items-center justify-center rounded-full border-2 border-background bg-destructive text-xs text-destructive-foreground">
+            <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-xs text-destructive-foreground">
               {unreadCount}
             </span>
           )}
@@ -46,15 +48,18 @@ export default function ChatsPage() {
         <h1 className="text-xl font-bold">AMIK CHAT</h1>
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="icon" className="h-8 w-8">
-            <Search className="h-5 w-5" />
-            <span className="sr-only">Search</span>
-          </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8">
             <PlusCircle className="h-5 w-5" />
             <span className="sr-only">New Chat</span>
           </Button>
         </div>
       </header>
+      <div className="p-4 border-b bg-muted/30">
+        <div className="relative">
+          <Label htmlFor="search-chats" className="sr-only">Search chats</Label>
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+          <Input id="search-chats" name="search-chats" placeholder="Search" className="pl-10 w-full" />
+        </div>
+      </div>
       <div className="divide-y">
         {chats.map(chat => (
           <ChatItem key={chat.id} chat={chat} />

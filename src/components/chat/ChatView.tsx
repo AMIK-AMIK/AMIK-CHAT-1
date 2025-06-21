@@ -9,6 +9,7 @@ import type { Chat, Message } from "@/lib/types";
 import { currentUser } from "@/lib/data";
 import { SendHorizonal } from "lucide-react";
 import MessageBubble from "./MessageBubble";
+import { Label } from "@/components/ui/label";
 
 export default function ChatView({ chat }: { chat: Chat }) {
   const [messages, setMessages] = useState<Message[]>(chat.messages);
@@ -51,7 +52,12 @@ export default function ChatView({ chat }: { chat: Chat }) {
       </ScrollArea>
       <div className="border-t bg-background p-4">
         <form onSubmit={handleSendMessage} className="flex items-center gap-2">
+          <Label htmlFor="message-input" className="sr-only">
+            Type a message
+          </Label>
           <Input
+            id="message-input"
+            name="message-input"
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Type a message..."
