@@ -6,7 +6,7 @@ import { Compass, MessageSquare, Users, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { href: "/chats", icon: MessageSquare, label: "Chats" },
+  { href: "/chats", icon: MessageSquare, label: "Chats", badge: 1 },
   { href: "/contacts", icon: Users, label: "Contacts" },
   { href: "/discover", icon: Compass, label: "Discover" },
   { href: "/me", icon: User, label: "Me" },
@@ -14,9 +14,6 @@ const navItems = [
 
 export default function BottomNav() {
   const pathname = usePathname();
-
-  // Unread count logic removed as it requires a more complex real-time listener setup.
-  // This can be added back as a future enhancement.
 
   return (
     <footer className="fixed bottom-0 left-0 right-0 z-10 mx-auto max-w-2xl border-t bg-background">
@@ -29,12 +26,17 @@ export default function BottomNav() {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex flex-col items-center gap-1 rounded-md px-4 py-1 text-xs font-medium transition-colors w-1/4",
+                "flex flex-col items-center gap-1 rounded-md px-4 py-1 text-xs font-medium transition-colors w-1/4 relative",
                 isActive ? "text-primary" : "text-muted-foreground hover:text-primary"
               )}
             >
               <div className="relative">
                 <item.icon className="h-7 w-7" />
+                {item.badge && (
+                   <div className="absolute -top-1 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] text-destructive-foreground">
+                    {item.badge}
+                  </div>
+                )}
               </div>
               <span>{item.label}</span>
             </Link>

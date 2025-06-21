@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ChevronRight, LogOut, Settings, UserCircle, QrCode } from "lucide-react";
+import { ChevronRight, LogOut, Settings, UserCircle, QrCode, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -35,8 +35,12 @@ export default function MePage() {
 
   return (
     <div>
-      <header className="sticky top-0 z-10 border-b bg-background p-4">
+      <header className="sticky top-0 z-10 flex items-center justify-between border-b bg-background p-4">
         <h1 className="text-xl font-bold">Me</h1>
+         <Button variant="ghost" size="icon" className="h-8 w-8">
+            <Plus className="h-5 w-5" />
+            <span className="sr-only">Add</span>
+          </Button>
       </header>
 
       <div className="p-4 space-y-6">

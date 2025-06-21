@@ -8,9 +8,8 @@ import type { Chat, User, Message } from '@/lib/types';
 import { currentUserId } from '@/lib/data';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { PlusCircle, Search } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Search, Plus, MessageCircle, UserPlus, ScanLine, Landmark } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 function ChatItem({ chat }: { chat: Chat }) {
@@ -51,7 +50,6 @@ function ChatItem({ chat }: { chat: Chat }) {
 export default function ChatsPage() {
   const [chats, setChats] = useState<Chat[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const q = query(
@@ -71,7 +69,6 @@ export default function ChatsPage() {
           const currentUserDoc = await getDoc(doc(db, 'users', currentUserId));
           const currentUserData = { id: currentUserDoc.id, ...currentUserDoc.data() } as User;
 
-          // Get last message
           const messagesQuery = query(collection(db, `chats/${chatDoc.id}/messages`), orderBy('timestamp', 'desc'), limit(1));
           const messagesSnapshot = await getDocs(messagesQuery);
           const lastMessage = messagesSnapshot.empty ? null : {id: messagesSnapshot.docs[0].id, ...messagesSnapshot.docs[0].data()} as Message;
@@ -98,41 +95,48 @@ export default function ChatsPage() {
     return () => unsubscribe();
   }, []);
 
-  const filteredChats = chats.filter(chat => {
-    const otherParticipant = chat.participants.find(p => p.id !== currentUserId);
-    return otherParticipant?.name.toLowerCase().includes(searchQuery.toLowerCase());
-  });
-
   return (
     <div>
       <header className="sticky top-0 z-10 flex items-center justify-between border-b bg-background p-4">
         <h1 className="text-xl font-bold">AMIK CHAT</h1>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="h-8 w-8">
-            <PlusCircle className="h-5 w-5" />
-            <span className="sr-only">New Chat</span>
-          </Button>
+           <Button variant="ghost" size="icon" className="h-8 w-8">
+              <Search className="h-5 w-5" />
+              <span className="sr-only">Search</span>
+            </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <Plus className="h-5 w-5" />
+                <span className="sr-only">New Chat</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem>
+                <MessageCircle className="mr-2 h-4 w-4" />
+                <span>New Chat</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <UserPlus className="mr-2 h-4 w-4" />
+                <span>Add Contacts</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <ScanLine className="mr-2 h-4 w-4" />
+                <span>Scan</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Landmark className="mr-2 h-4 w-4" />
+                <span>Money</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </header>
-      <div className="p-4 border-b bg-muted/30">
-        <div className="relative">
-          <Label htmlFor="search-chats" className="sr-only">Search chats</Label>
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-          <Input 
-            id="search-chats" 
-            name="search-chats" 
-            placeholder="Search" 
-            className="pl-10 w-full" 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-      </div>
       <div className="divide-y">
         {loading ? (
           <p className="p-4 text-center text-muted-foreground">Loading chats...</p>
-        ) : filteredChats.length > 0 ? (
-          filteredChats.map(chat => (
+        ) : chats.length > 0 ? (
+          chats.map(chat => (
             <ChatItem key={chat.id} chat={chat} />
           ))
         ) : (
