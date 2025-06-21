@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { db } from '@/lib/firebase';
-import { collection, query, where, onSnapshot, doc, getDoc, orderBy, limit, getDocs } from 'firebase/firestore';
-import type { Chat, User, Message } from '@/lib/types';
+import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore';
+import type { Chat } from '@/lib/types';
 import { useAuth } from '@/hooks/useAuth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -15,8 +15,9 @@ import { Search, Plus, MessageCircle, UserPlus, ScanLine, Landmark } from 'lucid
 import { formatDistanceToNow } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 
-function ChatItem({ chat }: { chat: Chat & { otherParticipant?: User } }) {
-  const { otherParticipant } = chat;
+function ChatItem({ chat, currentUserId }: { chat: Chat; currentUserId: string }) {
+  const otherParticipantId = chat.participantIds.find(id => id !== currentUserId);
+  const otherParticipant = otherParticipantId ? chat.participantsInfo[otherParticipantId] : null;
   const [time, setTime] = useState('');
 
   useEffect(() => {
@@ -24,17 +25,13 @@ function ChatItem({ chat }: { chat: Chat & { otherParticipant?: User } }) {
     const updateFuzzyTime = () => {
       if (chat.lastMessage?.timestamp) {
         try {
-          // Timestamps can be null if a chat is new, handle gracefully.
-          const date = chat.lastMessage.timestamp?.toDate();
-          if (date) {
-            setTime(formatDistanceToNow(date, { addSuffix: true }));
-          } else {
-            setTime('');
-          }
+          const date = chat.lastMessage.timestamp.toDate();
+          setTime(formatDistanceToNow(date, { addSuffix: true }));
         } catch (e) {
-          // This can happen if timestamp is a server value not yet resolved.
           setTime('just now');
         }
+      } else {
+        setTime('');
       }
       timeoutId = setTimeout(updateFuzzyTime, 60000); // update every minute
     };
@@ -75,60 +72,46 @@ export default function ChatsPage() {
   useEffect(() => {
     if (!currentUser) return;
     
+    // This query is now much more efficient.
+    // NOTE: Firestore may require a composite index for this query.
+    // The console error will provide a link to create it easily.
     const q = query(
       collection(db, 'chats'),
-      where('participantIds', 'array-contains', currentUser.uid)
+      where('participantIds', 'array-contains', currentUser.uid),
+      orderBy('lastMessage.timestamp', 'desc')
     );
 
-    const unsubscribe = onSnapshot(q, async (querySnapshot) => {
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
       setLoading(true);
-      const chatsDataPromises = querySnapshot.docs.map(async (chatDoc) => {
-        const chatData = chatDoc.data();
-        const participantIds: string[] = chatData.participantIds;
-        
-        const otherParticipantId = participantIds.find((id) => id !== currentUser.uid);
-        let otherParticipant: User | undefined;
-        if(otherParticipantId) {
-            const userDoc = await getDoc(doc(db, 'users', otherParticipantId));
-            if (userDoc.exists()) {
-                otherParticipant = { id: userDoc.id, ...userDoc.data() } as User;
-            }
-        }
-
-        const messagesQuery = query(collection(db, `chats/${chatDoc.id}/messages`), orderBy('timestamp', 'desc'), limit(1));
-        const messagesSnapshot = await getDocs(messagesQuery);
-        const lastMessage = messagesSnapshot.empty ? null : {id: messagesSnapshot.docs[0].id, ...messagesSnapshot.docs[0].data()} as Message;
-
-        return {
-          id: chatDoc.id,
-          participants: otherParticipant ? [otherParticipant] : [], // Simplified for now
-          otherParticipant: otherParticipant,
-          participantIds: participantIds,
-          lastMessage: lastMessage
-        };
-      });
-
-      const resolvedChatsData = await Promise.all(chatsDataPromises);
+      const chatsData = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+      })) as Chat[];
       
-      resolvedChatsData.sort((a, b) => {
+      // Fallback sort for chats with no messages (lastMessage.timestamp is null)
+      chatsData.sort((a, b) => {
         const timeA = a.lastMessage?.timestamp?.toDate()?.getTime() || a.createdAt?.toDate()?.getTime() || 0;
         const timeB = b.lastMessage?.timestamp?.toDate()?.getTime() || b.createdAt?.toDate()?.getTime() || 0;
         return timeB - timeA;
       });
 
-      setChats(resolvedChatsData as Chat[]);
+      setChats(chatsData);
       setLoading(false);
     }, (error) => {
         console.error("Error fetching chats: ", error);
         setLoading(false);
-        toast({ variant: "destructive", title: "Error", description: "Could not fetch chats." });
+        toast({ variant: "destructive", title: "Error", description: "Could not fetch chats. You may need to create a Firestore index." });
     });
 
     return () => unsubscribe();
   }, [currentUser, toast]);
   
   const filteredChats = chats.filter(chat => {
-    const otherParticipant = (chat as any).otherParticipant;
+    if (!currentUser) return false;
+    const otherParticipantId = chat.participantIds.find(id => id !== currentUser.uid);
+    if (!otherParticipantId) return false;
+    
+    const otherParticipant = chat.participantsInfo[otherParticipantId];
     return otherParticipant?.name.toLowerCase().includes(searchTerm.toLowerCase());
   });
 
@@ -181,7 +164,7 @@ export default function ChatsPage() {
           <p className="p-4 text-center text-muted-foreground">Loading chats...</p>
         ) : filteredChats.length > 0 ? (
           filteredChats.map(chat => (
-            <ChatItem key={chat.id} chat={chat} />
+            currentUser && <ChatItem key={chat.id} chat={chat} currentUserId={currentUser.uid} />
           ))
         ) : (
            <p className="p-4 text-center text-muted-foreground">No chats found.</p>

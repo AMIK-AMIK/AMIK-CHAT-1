@@ -39,18 +39,23 @@ export default function ChatPage({ params }: { params: { id: string } }) {
 
         const otherParticipantId = chatData.participantIds.find((id: string) => id !== currentUser.uid);
 
-        if (otherParticipantId) {
-          const userDocRef = doc(db, 'users', otherParticipantId);
-          const userDoc = await getDoc(userDocRef);
-          if (userDoc.exists()) {
-            setOtherParticipant({ id: userDoc.id, ...userDoc.data() } as User);
+        if (otherParticipantId && chatData.participantsInfo) {
+          const otherInfo = chatData.participantsInfo[otherParticipantId];
+          if (otherInfo) {
+            setOtherParticipant({
+                id: otherParticipantId,
+                name: otherInfo.name,
+                avatarUrl: otherInfo.avatarUrl
+            });
           }
-        } else {
-            const userDocRef = doc(db, 'users', currentUser.uid);
-            const userDoc = await getDoc(userDocRef);
-            if(userDoc.exists()) {
-                setOtherParticipant({ id: userDoc.id, ...userDoc.data() } as User);
-            }
+        } else if (chatData.participantsInfo && chatData.participantsInfo[currentUser.uid]) {
+            // Handle self-chat case by loading current user's info
+            const selfInfo = chatData.participantsInfo[currentUser.uid];
+            setOtherParticipant({
+                id: currentUser.uid,
+                name: selfInfo.name,
+                avatarUrl: selfInfo.avatarUrl,
+            });
         }
       } catch (error) {
         console.error("Error fetching chat info:", error);
@@ -77,6 +82,11 @@ export default function ChatPage({ params }: { params: { id: string } }) {
       querySnapshot.docs.forEach(doc => {
         batch.update(doc.ref, { isRead: true });
       });
+
+      // Also update the isRead status on the denormalized lastMessage on the chat document
+      const chatRef = doc(db, 'chats', params.id);
+      batch.update(chatRef, { 'lastMessage.isRead': true });
+      
       await batch.commit();
     };
 

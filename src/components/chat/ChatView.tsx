@@ -10,7 +10,7 @@ import { SendHorizonal } from "lucide-react";
 import MessageBubble from "./MessageBubble";
 import { Label } from "@/components/ui/label";
 import { db } from "@/lib/firebase";
-import { collection, addDoc, serverTimestamp, query, orderBy, onSnapshot } from "firebase/firestore";
+import { collection, serverTimestamp, query, orderBy, onSnapshot, writeBatch, doc } from "firebase/firestore";
 
 export default function ChatView({ chatId }: { chatId: string }) {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -46,12 +46,32 @@ export default function ChatView({ chatId }: { chatId: string }) {
     const messageText = newMessage;
     setNewMessage("");
 
-    await addDoc(collection(db, `chats/${chatId}/messages`), {
+    const chatRef = doc(db, 'chats', chatId);
+    const messagesColRef = collection(chatRef, 'messages');
+    const newMessageRef = doc(messagesColRef);
+
+    const batch = writeBatch(db);
+
+    const timestamp = serverTimestamp();
+
+    const messageData = {
       text: messageText,
       senderId: currentUser.uid,
-      timestamp: serverTimestamp(),
-      isRead: false, // Default value
+      timestamp: timestamp,
+      isRead: false,
+    };
+    batch.set(newMessageRef, messageData);
+
+    batch.update(chatRef, {
+      lastMessage: {
+        text: messageText,
+        senderId: currentUser.uid,
+        timestamp: timestamp,
+        isRead: false,
+      }
     });
+
+    await batch.commit();
   };
 
   return (

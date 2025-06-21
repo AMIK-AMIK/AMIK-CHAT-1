@@ -16,7 +16,7 @@ export default function NewChatPage() {
   const [loading, setLoading] = useState(true);
   const [creatingChat, setCreatingChat] = useState<string | null>(null); // Store ID of contact being processed
   const router = useRouter();
-  const { user: currentUser } = useAuth();
+  const { user: currentUser, userData } = useAuth();
 
   useEffect(() => {
     if (!currentUser) return;
@@ -45,7 +45,7 @@ export default function NewChatPage() {
   }, [currentUser]);
 
   const handleSelectContact = async (contact: User) => {
-    if (!currentUser) return;
+    if (!currentUser || !userData) return;
     setCreatingChat(contact.id);
     
     const participantIds = [currentUser.uid, contact.id].sort();
@@ -60,11 +60,23 @@ export default function NewChatPage() {
         const chatId = querySnapshot.docs[0].id;
         router.push(`/chats/${chatId}`);
       } else {
-        // Chat doesn't exist, create it
-        const newChatRef = await addDoc(collection(db, 'chats'), {
+        // Chat doesn't exist, create it with denormalized data
+        const newChatData = {
           participantIds: participantIds,
+          participantsInfo: {
+            [currentUser.uid]: {
+              name: userData.name,
+              avatarUrl: userData.avatarUrl,
+            },
+            [contact.id]: {
+              name: contact.name,
+              avatarUrl: contact.avatarUrl,
+            },
+          },
           createdAt: serverTimestamp(),
-        });
+          lastMessage: null,
+        };
+        const newChatRef = await addDoc(collection(db, 'chats'), newChatData);
         router.push(`/chats/${newChatRef.id}`);
       }
     } catch (error) {

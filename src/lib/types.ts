@@ -15,9 +15,19 @@ export type Message = {
 };
 
 export type Chat = {
-  id:string;
-  participants: User[];
+  id: string;
   participantIds: string[];
-  lastMessage?: Message | null;
+  participantsInfo: {
+    [key: string]: {
+      name: string;
+      avatarUrl: string;
+    }
+  };
+  lastMessage?: {
+    text: string;
+    senderId: string;
+    timestamp: Timestamp;
+    isRead: boolean;
+  } | null;
   createdAt?: Timestamp;
 };
