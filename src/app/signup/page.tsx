@@ -31,6 +31,16 @@ export default function SignupPage() {
     const email = target.email.value;
     const password = target.password.value;
 
+    if (!process.env.NEXT_PUBLIC_FIREBASE_API_KEY || process.env.NEXT_PUBLIC_FIREBASE_API_KEY === "YOUR_API_KEY_HERE") {
+      toast({
+        variant: "destructive",
+        title: "Configuration Error",
+        description: "Firebase is not configured. Please add your credentials to the .env file.",
+      });
+      setLoading(false);
+      return;
+    }
+
     if (password.length < 6) {
         toast({
             variant: "destructive",
@@ -54,10 +64,16 @@ export default function SignupPage() {
       router.push('/chats');
 
     } catch (error: any) {
+      let description = "An unknown error occurred.";
+      if (error.code === 'auth/api-key-not-valid') {
+        description = "Your Firebase API key is not valid. Please check your .env file."
+      } else if (error.message) {
+        description = error.message;
+      }
       toast({
         variant: "destructive",
         title: "Signup Failed",
-        description: error.message,
+        description: description,
       });
     } finally {
       setLoading(false);
@@ -80,15 +96,15 @@ export default function SignupPage() {
           <form onSubmit={handleSignup} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="username">Username</Label>
-              <Input id="username" type="text" placeholder="Your Name" required />
+              <Input id="username" name="username" type="text" placeholder="Your Name" required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="m@example.com" required />
+              <Input id="email" name="email" type="email" placeholder="m@example.com" required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" required />
+              <Input id="password" name="password" type="password" required />
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
