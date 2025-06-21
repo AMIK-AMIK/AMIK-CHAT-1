@@ -5,23 +5,29 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { collection, doc, getDoc, onSnapshot, query, where, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { currentUserId } from '@/lib/data';
+import { useAuth } from '@/hooks/useAuth';
 import type { User } from '@/lib/types';
 import { ChevronLeft, Loader2 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Button } from '@/components/ui/button';
 
 export default function NewChatPage() {
   const [contacts, setContacts] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [creatingChat, setCreatingChat] = useState<string | null>(null); // Store ID of contact being processed
   const router = useRouter();
+  const { user: currentUser } = useAuth();
 
   useEffect(() => {
-    const contactsColRef = collection(db, 'users', currentUserId, 'contacts');
+    if (!currentUser) return;
+    const contactsColRef = collection(db, 'users', currentUser.uid, 'contacts');
     const unsubscribe = onSnapshot(contactsColRef, async (snapshot) => {
       try {
+        if (snapshot.empty) {
+          setContacts([]);
+          setLoading(false);
+          return;
+        }
         const contactPromises = snapshot.docs.map(contactDoc => getDoc(doc(db, 'users', contactDoc.id)));
         const contactDocs = await Promise.all(contactPromises);
         const contactsData = contactDocs
@@ -36,14 +42,13 @@ export default function NewChatPage() {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [currentUser]);
 
   const handleSelectContact = async (contact: User) => {
+    if (!currentUser) return;
     setCreatingChat(contact.id);
     
-    // Sort participant IDs to ensure query consistency.
-    // Firestore requires an index for this kind of query, you will be prompted to create it in the console.
-    const participantIds = [currentUserId, contact.id].sort();
+    const participantIds = [currentUser.uid, contact.id].sort();
 
     try {
       // Check if a chat already exists
@@ -84,6 +89,10 @@ export default function NewChatPage() {
               <Skeleton className="h-10 w-10 rounded-full" />
               <Skeleton className="h-5 w-32" />
             </div>
+             <div className="flex items-center gap-4">
+              <Skeleton className="h-10 w-10 rounded-full" />
+              <Skeleton className="h-5 w-40" />
+            </div>
           </div>
         ) : contacts.length > 0 ? (
           contacts.map(contact => (
@@ -101,7 +110,7 @@ export default function NewChatPage() {
             </div>
           ))
         ) : (
-          <p className="p-4 text-center text-muted-foreground">You have no contacts to start a chat with.</p>
+          <p className="p-4 text-center text-muted-foreground">You have no contacts to start a chat with. <Link href="/contacts/add" className='text-primary underline'>Add one!</Link></p>
         )}
       </div>
     </div>

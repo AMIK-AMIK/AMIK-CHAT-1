@@ -6,31 +6,23 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChevronRight, LogOut, Settings, UserCircle, QrCode, Plus } from "lucide-react";
-import { useEffect, useState } from "react";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
-import { currentUserId } from "@/lib/data";
-import type { User } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from "@/hooks/useAuth";
+import { auth } from "@/lib/firebase";
+import { signOut } from "firebase/auth";
 
 
 export default function MePage() {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      const userDoc = await getDoc(doc(db, 'users', currentUserId));
-      if (userDoc.exists()) {
-        setUser({id: userDoc.id, ...userDoc.data()} as User);
-      }
+  const { userData, user } = useAuth();
+  
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      router.push('/login');
+    } catch (error) {
+      console.error("Error signing out: ", error);
     }
-    fetchUser();
-  }, [])
-
-  const handleLogout = () => {
-    // In a real app, clear session/token here
-    router.push('/login');
   };
 
   return (
@@ -44,15 +36,15 @@ export default function MePage() {
       </header>
 
       <div className="p-4 space-y-6">
-        {user ? (
+        {userData && user ? (
           <div className="flex items-center gap-4">
             <Avatar className="h-20 w-20 border">
-              <AvatarImage src={user.avatarUrl} alt={user.name} data-ai-hint="profile person" />
-              <AvatarFallback className="text-3xl">{user.name.charAt(0)}</AvatarFallback>
+              <AvatarImage src={userData.avatarUrl} alt={userData.name} data-ai-hint="profile person" />
+              <AvatarFallback className="text-3xl">{userData.name.charAt(0)}</AvatarFallback>
             </Avatar>
             <div className="flex-1">
-              <p className="text-xl font-semibold">{user.name}</p>
-              <p className="text-muted-foreground">AMIK CHAT ID: {user.id}</p>
+              <p className="text-xl font-semibold">{userData.name}</p>
+              <p className="text-muted-foreground break-all">AMIK CHAT ID: {user.uid}</p>
             </div>
             <Link href="/qr" className="p-2 rounded-md hover:bg-muted">
               <QrCode className="h-6 w-6 text-muted-foreground" />

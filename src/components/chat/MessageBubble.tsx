@@ -1,9 +1,12 @@
+"use client";
+
 import type { Message } from "@/lib/types";
-import { currentUserId } from "@/lib/data";
+import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 
 export default function MessageBubble({ message }: { message: Message }) {
-  const isSentByMe = message.senderId === currentUserId;
+  const { user: currentUser } = useAuth();
+  const isSentByMe = message.senderId === currentUser?.uid;
 
   return (
     <div className={cn("flex items-end gap-2", isSentByMe ? "justify-end" : "justify-start")}>

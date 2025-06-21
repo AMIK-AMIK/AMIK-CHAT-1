@@ -7,7 +7,7 @@ import ContactSuggestions from "@/components/contacts/ContactSuggestions";
 import { Button } from "@/components/ui/button";
 import { collection, doc, getDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { currentUserId } from '@/lib/data';
+import { useAuth } from '@/hooks/useAuth';
 import type { User } from '@/lib/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -29,12 +29,23 @@ function ContactItem({ contact }: { contact: User }) {
 export default function ContactsPage() {
   const [contacts, setContacts] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user: currentUser } = useAuth();
 
   useEffect(() => {
-    const contactsColRef = collection(db, 'users', currentUserId, 'contacts');
+    if (!currentUser) {
+      setLoading(false);
+      return;
+    };
+    
+    const contactsColRef = collection(db, 'users', currentUser.uid, 'contacts');
     
     const unsubscribe = onSnapshot(contactsColRef, async (snapshot) => {
       try {
+        if (snapshot.empty) {
+            setContacts([]);
+            setLoading(false);
+            return;
+        }
         const contactPromises = snapshot.docs.map(contactDoc => getDoc(doc(db, 'users', contactDoc.id)));
         const contactDocs = await Promise.all(contactPromises);
         const contactsData = contactDocs
@@ -49,7 +60,7 @@ export default function ContactsPage() {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [currentUser]);
 
   return (
     <div>

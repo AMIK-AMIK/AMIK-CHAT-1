@@ -11,22 +11,23 @@ import { ChevronLeft, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { currentUserId } from '@/lib/data';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function AddContactPage() {
   const [contactId, setContactId] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
+  const { user: currentUser } = useAuth();
 
   const handleAddContact = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!contactId.trim() || loading) return;
+    if (!contactId.trim() || loading || !currentUser) return;
 
     setLoading(true);
 
     try {
-      if (contactId.trim() === currentUserId) {
+      if (contactId.trim() === currentUser.uid) {
          toast({
           variant: 'destructive',
           title: 'Error',
@@ -47,17 +48,16 @@ export default function AddContactPage() {
         return;
       }
 
-      const contactRef = doc(db, 'users', currentUserId, 'contacts', contactId.trim());
+      const contactRef = doc(db, 'users', currentUser.uid, 'contacts', contactId.trim());
       await setDoc(contactRef, {
         addedAt: new Date(),
       });
 
       // Also add current user to the other person's contact list
-      const currentUserAsContactRef = doc(db, 'users', contactId.trim(), 'contacts', currentUserId);
+      const currentUserAsContactRef = doc(db, 'users', contactId.trim(), 'contacts', currentUser.uid);
       await setDoc(currentUserAsContactRef, {
         addedAt: new Date(),
       });
-
 
       toast({
         title: 'Success!',
@@ -99,7 +99,7 @@ export default function AddContactPage() {
                 <Label htmlFor="contact-id">AMIK CHAT ID</Label>
                 <Input
                   id="contact-id"
-                  placeholder="e.g., user-2"
+                  placeholder="e.g., fJ...xZ"
                   value={contactId}
                   onChange={(e) => setContactId(e.target.value)}
                   required
@@ -107,7 +107,7 @@ export default function AddContactPage() {
               </div>
             </CardContent>
             <CardFooter>
-              <Button type="submit" disabled={loading} className="w-full">
+              <Button type="submit" disabled={loading || !currentUser} className="w-full">
                 {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 Add Contact
               </Button>

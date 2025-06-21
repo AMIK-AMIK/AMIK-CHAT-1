@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { Message } from "@/lib/types";
-import { currentUserId } from "@/lib/data";
+import { useAuth } from "@/hooks/useAuth";
 import { SendHorizonal } from "lucide-react";
 import MessageBubble from "./MessageBubble";
 import { Label } from "@/components/ui/label";
@@ -17,6 +17,7 @@ export default function ChatView({ chatId }: { chatId: string }) {
   const [newMessage, setNewMessage] = useState("");
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
+  const { user: currentUser } = useAuth();
 
   useEffect(() => {
     const q = query(collection(db, `chats/${chatId}/messages`), orderBy("timestamp", "asc"));
@@ -40,14 +41,14 @@ export default function ChatView({ chatId }: { chatId: string }) {
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (newMessage.trim() === "") return;
+    if (newMessage.trim() === "" || !currentUser) return;
     
     const messageText = newMessage;
     setNewMessage("");
 
     await addDoc(collection(db, `chats/${chatId}/messages`), {
       text: messageText,
-      senderId: currentUserId,
+      senderId: currentUser.uid,
       timestamp: serverTimestamp(),
       isRead: false, // Default value
     });
@@ -80,7 +81,7 @@ export default function ChatView({ chatId }: { chatId: string }) {
             autoComplete="off"
             className="text-base"
           />
-          <Button type="submit" size="icon" disabled={!newMessage.trim()}>
+          <Button type="submit" size="icon" disabled={!newMessage.trim() || !currentUser}>
             <SendHorizonal className="h-5 w-5" />
             <span className="sr-only">Send</span>
           </Button>

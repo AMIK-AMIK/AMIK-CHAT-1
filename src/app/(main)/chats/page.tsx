@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { db } from '@/lib/firebase';
 import { collection, query, where, onSnapshot, doc, getDoc, orderBy, limit, getDocs } from 'firebase/firestore';
 import type { Chat, User, Message } from '@/lib/types';
-import { currentUserId } from '@/lib/data';
+import { useAuth } from '@/hooks/useAuth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -15,18 +15,32 @@ import { Search, Plus, MessageCircle, UserPlus, ScanLine, Landmark } from 'lucid
 import { formatDistanceToNow } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 
-function ChatItem({ chat }: { chat: Chat }) {
-  const otherParticipant = chat.participants.find(p => p.id !== currentUserId);
+function ChatItem({ chat }: { chat: Chat & { otherParticipant?: User } }) {
+  const { otherParticipant } = chat;
   const [time, setTime] = useState('');
 
   useEffect(() => {
-    if (chat.lastMessage?.timestamp) {
-      try {
-        setTime(formatDistanceToNow(chat.lastMessage.timestamp.toDate(), { addSuffix: true }));
-      } catch (e) {
-        setTime('just now');
+    let timeoutId: NodeJS.Timeout;
+    const updateFuzzyTime = () => {
+      if (chat.lastMessage?.timestamp) {
+        try {
+          // Timestamps can be null if a chat is new, handle gracefully.
+          const date = chat.lastMessage.timestamp?.toDate();
+          if (date) {
+            setTime(formatDistanceToNow(date, { addSuffix: true }));
+          } else {
+            setTime('');
+          }
+        } catch (e) {
+          // This can happen if timestamp is a server value not yet resolved.
+          setTime('just now');
+        }
       }
-    }
+      timeoutId = setTimeout(updateFuzzyTime, 60000); // update every minute
+    };
+
+    updateFuzzyTime();
+    return () => clearTimeout(timeoutId);
   }, [chat.lastMessage?.timestamp]);
 
   if (!otherParticipant) return null;
@@ -55,54 +69,66 @@ export default function ChatsPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const router = useRouter();
+  const { user: currentUser } = useAuth();
   const { toast } = useToast();
 
   useEffect(() => {
+    if (!currentUser) return;
+    
     const q = query(
       collection(db, 'chats'),
-      where('participantIds', 'array-contains', currentUserId)
+      where('participantIds', 'array-contains', currentUser.uid)
     );
 
     const unsubscribe = onSnapshot(q, async (querySnapshot) => {
-      const chatsData: Chat[] = await Promise.all(
-        querySnapshot.docs.map(async (chatDoc) => {
-          const chatData = chatDoc.data();
-          const participantIds = chatData.participantIds;
-          
-          const otherParticipantId = participantIds.find((id: string) => id !== currentUserId);
-          const userDoc = await getDoc(doc(db, 'users', otherParticipantId));
-          const otherParticipant = { id: userDoc.id, ...userDoc.data() } as User;
-          const currentUserDoc = await getDoc(doc(db, 'users', currentUserId));
-          const currentUserData = { id: currentUserDoc.id, ...currentUserDoc.data() } as User;
+      setLoading(true);
+      const chatsDataPromises = querySnapshot.docs.map(async (chatDoc) => {
+        const chatData = chatDoc.data();
+        const participantIds: string[] = chatData.participantIds;
+        
+        const otherParticipantId = participantIds.find((id) => id !== currentUser.uid);
+        let otherParticipant: User | undefined;
+        if(otherParticipantId) {
+            const userDoc = await getDoc(doc(db, 'users', otherParticipantId));
+            if (userDoc.exists()) {
+                otherParticipant = { id: userDoc.id, ...userDoc.data() } as User;
+            }
+        }
 
-          const messagesQuery = query(collection(db, `chats/${chatDoc.id}/messages`), orderBy('timestamp', 'desc'), limit(1));
-          const messagesSnapshot = await getDocs(messagesQuery);
-          const lastMessage = messagesSnapshot.empty ? null : {id: messagesSnapshot.docs[0].id, ...messagesSnapshot.docs[0].data()} as Message;
+        const messagesQuery = query(collection(db, `chats/${chatDoc.id}/messages`), orderBy('timestamp', 'desc'), limit(1));
+        const messagesSnapshot = await getDocs(messagesQuery);
+        const lastMessage = messagesSnapshot.empty ? null : {id: messagesSnapshot.docs[0].id, ...messagesSnapshot.docs[0].data()} as Message;
 
-          return {
-            id: chatDoc.id,
-            participants: [currentUserData, otherParticipant],
-            participantIds: participantIds,
-            lastMessage: lastMessage
-          };
-        })
-      );
+        return {
+          id: chatDoc.id,
+          participants: otherParticipant ? [otherParticipant] : [], // Simplified for now
+          otherParticipant: otherParticipant,
+          participantIds: participantIds,
+          lastMessage: lastMessage
+        };
+      });
+
+      const resolvedChatsData = await Promise.all(chatsDataPromises);
       
-      chatsData.sort((a, b) => {
-        const timeA = a.lastMessage?.timestamp?.toDate()?.getTime() || 0;
-        const timeB = b.lastMessage?.timestamp?.toDate()?.getTime() || 0;
+      resolvedChatsData.sort((a, b) => {
+        const timeA = a.lastMessage?.timestamp?.toDate()?.getTime() || a.createdAt?.toDate()?.getTime() || 0;
+        const timeB = b.lastMessage?.timestamp?.toDate()?.getTime() || b.createdAt?.toDate()?.getTime() || 0;
         return timeB - timeA;
       });
 
-      setChats(chatsData);
+      setChats(resolvedChatsData as Chat[]);
       setLoading(false);
+    }, (error) => {
+        console.error("Error fetching chats: ", error);
+        setLoading(false);
+        toast({ variant: "destructive", title: "Error", description: "Could not fetch chats." });
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [currentUser, toast]);
   
   const filteredChats = chats.filter(chat => {
-    const otherParticipant = chat.participants.find(p => p.id !== currentUserId);
+    const otherParticipant = (chat as any).otherParticipant;
     return otherParticipant?.name.toLowerCase().includes(searchTerm.toLowerCase());
   });
 

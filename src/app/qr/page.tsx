@@ -1,12 +1,8 @@
 "use client";
 
-import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import QRCode from 'react-qr-code';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { currentUserId } from '@/lib/data';
-import type { User } from '@/lib/types';
+import { useAuth } from '@/hooks/useAuth';
 import { ChevronLeft, MoreHorizontal, MessageCircle } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -15,19 +11,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export default function QrCodePage() {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
+  const { user, userData } = useAuth();
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const userDoc = await getDoc(doc(db, 'users', currentUserId));
-      if (userDoc.exists()) {
-        setUser({ id: userDoc.id, ...userDoc.data() } as User);
-      }
-    };
-    fetchUser();
-  }, []);
-
-  const qrValue = user ? `amik-chat-user://${user.id}` : '';
+  const qrValue = user ? `amik-chat-user://${user.uid}` : '';
 
   return (
     <div className="flex h-screen flex-col bg-background">
@@ -42,15 +28,15 @@ export default function QrCodePage() {
 
       <main className="flex flex-1 flex-col items-center justify-between p-8 text-center">
         <div className="flex-grow flex flex-col items-center justify-center space-y-6">
-          {user ? (
+          {userData ? (
             <>
               <div className="flex items-center gap-4 self-start">
                 <Avatar className="h-16 w-16 border">
-                  <AvatarImage src={user.avatarUrl} alt={user.name} data-ai-hint="profile person" />
-                  <AvatarFallback className="text-2xl">{user.name.charAt(0)}</AvatarFallback>
+                  <AvatarImage src={userData.avatarUrl} alt={userData.name} data-ai-hint="profile person" />
+                  <AvatarFallback className="text-2xl">{userData.name.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="text-xl font-bold text-left">{user.name}</p>
+                  <p className="text-xl font-bold text-left">{userData.name}</p>
                   <p className="text-muted-foreground text-left">Pakistan</p> {/* Placeholder */}
                 </div>
               </div>
@@ -87,7 +73,7 @@ export default function QrCodePage() {
 
         <footer className="w-full max-w-sm pb-4">
           <div className="flex items-center justify-center space-x-2">
-            <Button variant="link" className="text-muted-foreground hover:text-primary px-2">Scan</Button>
+            <Button variant="link" className="text-muted-foreground hover:text-primary px-2" onClick={() => router.push('/scan')}>Scan</Button>
             <Separator orientation="vertical" className="h-4" />
             <Button variant="link" className="text-muted-foreground hover:text-primary px-2">Change Style</Button>
             <Separator orientation="vertical" className="h-4" />

@@ -5,17 +5,21 @@ import { useEffect, useState } from 'react';
 import { ChevronLeft, MoreHorizontal } from 'lucide-react';
 import ChatView from '@/components/chat/ChatView';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { notFound } from 'next/navigation';
+import { notFound, useRouter } from 'next/navigation';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import type { User } from '@/lib/types';
-import { currentUserId } from '@/lib/data';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function ChatPage({ params }: { params: { id: string } }) {
   const [otherParticipant, setOtherParticipant] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const { user: currentUser } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
+    if (!currentUser) return;
+
     const fetchChatInfo = async () => {
       try {
         const chatDocRef = doc(db, 'chats', params.id);
@@ -27,7 +31,13 @@ export default function ChatPage({ params }: { params: { id: string } }) {
         }
 
         const chatData = chatDoc.data();
-        const otherParticipantId = chatData.participantIds.find((id: string) => id !== currentUserId);
+        if (!chatData.participantIds.includes(currentUser.uid)) {
+            console.error("Current user not in this chat");
+            router.push('/chats');
+            return;
+        }
+
+        const otherParticipantId = chatData.participantIds.find((id: string) => id !== currentUser.uid);
 
         if (otherParticipantId) {
           const userDocRef = doc(db, 'users', otherParticipantId);
@@ -35,6 +45,14 @@ export default function ChatPage({ params }: { params: { id: string } }) {
           if (userDoc.exists()) {
             setOtherParticipant({ id: userDoc.id, ...userDoc.data() } as User);
           }
+        } else {
+            // This is a chat with only one person, maybe a "notes to self" chat.
+            // For now, let's just show the current user.
+            const userDocRef = doc(db, 'users', currentUser.uid);
+            const userDoc = await getDoc(userDocRef);
+            if(userDoc.exists()) {
+                setOtherParticipant({ id: userDoc.id, ...userDoc.data() } as User);
+            }
         }
       } catch (error) {
         console.error("Error fetching chat info:", error);
@@ -45,7 +63,7 @@ export default function ChatPage({ params }: { params: { id: string } }) {
     };
 
     fetchChatInfo();
-  }, [params.id]);
+  }, [params.id, currentUser, router]);
 
   if (loading) {
     return (
