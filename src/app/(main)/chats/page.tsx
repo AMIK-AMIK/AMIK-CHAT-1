@@ -39,12 +39,10 @@ function ChatItem({ chat }: { chat: Chat }) {
 }
 
 export default function ChatsPage() {
-  const unreadChatsCount = chats.filter(c => c.messages.some(m => !m.isRead && m.senderId !== currentUser.id)).length;
-
   return (
     <div>
       <header className="sticky top-0 z-10 flex items-center justify-between border-b bg-background p-4">
-        <h1 className="text-lg font-semibold">WeChat ({unreadChatsCount})</h1>
+        <h1 className="text-xl font-bold">WeChat</h1>
         <div className="flex items-center gap-5">
             <Search className="h-5 w-5 text-foreground" />
             <Plus className="h-6 w-6 text-foreground" />

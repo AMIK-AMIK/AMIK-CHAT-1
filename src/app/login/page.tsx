@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { MessageSquare } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -22,7 +22,7 @@ export default function LoginPage() {
     <div className="flex min-h-screen w-full items-center justify-center bg-background p-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <MessageSquare className="mx-auto h-16 w-16 text-primary" />
+          <MessageCircle className="mx-auto h-16 w-16 text-primary" />
           <h1 className="text-4xl font-bold mt-4">ChatSnap</h1>
         </div>
         <Card>

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, MoreHorizontal } from 'lucide-react';
 import { chats, currentUser } from '@/lib/data';
 import ChatView from '@/components/chat/ChatView';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -29,6 +29,9 @@ export default function ChatPage({ params }: { params: { id: string } }) {
             <h1 className="flex-1 truncate text-lg font-semibold">{otherParticipant.name}</h1>
           </>
         )}
+        <button className="p-1 rounded-md hover:bg-muted">
+          <MoreHorizontal className="h-6 w-6" />
+        </button>
       </header>
       <ChatView chat={chat} />
     </div>
