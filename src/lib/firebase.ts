@@ -10,9 +10,10 @@ const firebaseConfig = {
   apiKey: "AIzaSyAa6oAqK3kFremsOqAGg9dgSwhUmdt3KKw",
   authDomain: "nice-theater-415516.firebaseapp.com",
   projectId: "nice-theater-415516",
-  storageBucket: "nice-theater-415516.appspot.com",
+  storageBucket: "nice-theater-415516.firebasestorage.app",
   messagingSenderId: "638699560027",
-  appId: "1:638699560027:web:baf634eab0c80ac284f37e"
+  appId: "1:638699560027:web:baf634eab0c80ac284f37e",
+  measurementId: "G-7M4LF002RZ"
 };
 
 // Initialize Firebase
