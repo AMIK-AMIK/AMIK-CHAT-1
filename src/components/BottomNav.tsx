@@ -6,7 +6,7 @@ import { Compass, MessageSquare, Users, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { href: "/chats", icon: MessageSquare, label: "Chats", badge: 1 },
+  { href: "/chats", icon: MessageSquare, label: "Chats" },
   { href: "/contacts", icon: Users, label: "Contacts" },
   { href: "/discover", icon: Compass, label: "Discover" },
   { href: "/me", icon: User, label: "Me" },
@@ -32,11 +32,6 @@ export default function BottomNav() {
             >
               <div className="relative">
                 <item.icon className="h-7 w-7" />
-                {item.badge && (
-                   <div className="absolute -top-1 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] text-destructive-foreground">
-                    {item.badge}
-                  </div>
-                )}
               </div>
               <span>{item.label}</span>
             </Link>

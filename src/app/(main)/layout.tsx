@@ -34,7 +34,7 @@ export default function MainAppLayout({
 
   return (
     <div className="mx-auto flex h-screen max-w-2xl flex-col bg-background">
-      <main className="flex-1 overflow-y-auto pb-20">
+      <main className="flex-1 overflow-y-auto pb-28">
         {children}
       </main>
       <BottomNav />
