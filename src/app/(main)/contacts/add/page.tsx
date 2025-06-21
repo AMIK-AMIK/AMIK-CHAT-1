@@ -77,12 +77,12 @@ export default function AddContactPage() {
       });
       router.push('/contacts');
 
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error adding contact:", error);
       toast({
         variant: 'destructive',
-        title: 'Error',
-        description: 'Something went wrong while adding the contact. Please try again.',
+        title: 'Error Adding Contact',
+        description: error.message || 'Something went wrong. Please try again.',
       });
     } finally {
       setLoading(false);

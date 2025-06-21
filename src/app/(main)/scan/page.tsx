@@ -86,12 +86,12 @@ export default function ScanPage() {
         });
         router.push('/contacts');
 
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error adding contact from QR code:", error);
         toast({
             variant: 'destructive',
-            title: 'Error',
-            description: 'Something went wrong. Please try again.',
+            title: 'Error Adding Contact',
+            description: error.message || 'Something went wrong. Please try again.',
         });
         router.back();
     }
