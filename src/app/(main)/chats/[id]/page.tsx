@@ -6,7 +6,7 @@ import { ChevronLeft, MoreHorizontal } from 'lucide-react';
 import ChatView from '@/components/chat/ChatView';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { notFound, useRouter } from 'next/navigation';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, getDocs, writeBatch } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import type { User } from '@/lib/types';
 import { useAuth } from '@/hooks/useAuth';
@@ -46,8 +46,6 @@ export default function ChatPage({ params }: { params: { id: string } }) {
             setOtherParticipant({ id: userDoc.id, ...userDoc.data() } as User);
           }
         } else {
-            // This is a chat with only one person, maybe a "notes to self" chat.
-            // For now, let's just show the current user.
             const userDocRef = doc(db, 'users', currentUser.uid);
             const userDoc = await getDoc(userDocRef);
             if(userDoc.exists()) {
@@ -64,6 +62,26 @@ export default function ChatPage({ params }: { params: { id: string } }) {
 
     fetchChatInfo();
   }, [params.id, currentUser, router]);
+
+  useEffect(() => {
+    if (!currentUser || !params.id) return;
+
+    const markMessagesAsRead = async () => {
+      const messagesRef = collection(db, 'chats', params.id, 'messages');
+      const q = query(messagesRef, where('senderId', '!=', currentUser.uid), where('isRead', '==', false));
+      const querySnapshot = await getDocs(q);
+      
+      if (querySnapshot.empty) return;
+
+      const batch = writeBatch(db);
+      querySnapshot.docs.forEach(doc => {
+        batch.update(doc.ref, { isRead: true });
+      });
+      await batch.commit();
+    };
+
+    markMessagesAsRead().catch(console.error);
+  }, [params.id, currentUser]);
 
   if (loading) {
     return (
