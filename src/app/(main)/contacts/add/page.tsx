@@ -66,8 +66,6 @@ export default function AddContactPage() {
           return;
       }
 
-      // Add the new contact to the current user's list.
-      // This is a one-way add to prevent security rule violations.
       const newContactRef = doc(db, 'users', currentUser.uid, 'contacts', trimmedId);
       await setDoc(newContactRef, { addedAt: serverTimestamp() });
 

@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
-import { doc, getDoc, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
 import type { User } from '@/lib/types';
 
 interface AuthContextType {
@@ -20,31 +20,50 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribeAuth = onAuthStateChanged(auth, (firebaseUser) => {
-      setUser(firebaseUser);
-      if (!firebaseUser) {
+    let unsubscribeDoc: () => void = () => {};
+
+    const unsubscribeAuth = onAuthStateChanged(auth, async (firebaseUser) => {
+      unsubscribeDoc();
+
+      if (firebaseUser) {
+        setLoading(true);
+        const userDocRef = doc(db, 'users', firebaseUser.uid);
+        
+        const userDocSnap = await getDoc(userDocRef);
+        if (!userDocSnap.exists()) {
+          const nameFromEmail = firebaseUser.email ? firebaseUser.email.split('@')[0] : 'New User';
+          try {
+            await setDoc(userDocRef, {
+              name: nameFromEmail,
+              avatarUrl: `https://placehold.co/100x100.png?text=${nameFromEmail.charAt(0).toUpperCase()}`
+            });
+          } catch (error) {
+            console.error("Failed to create user document for existing auth user:", error);
+          }
+        }
+        
+        unsubscribeDoc = onSnapshot(userDocRef, (doc) => {
+          if (doc.exists()) {
+            setUserData({ id: doc.id, ...doc.data() } as User);
+          } else {
+            setUserData(null);
+          }
+          setLoading(false);
+        });
+
+        setUser(firebaseUser);
+      } else {
+        setUser(null);
         setUserData(null);
         setLoading(false);
       }
     });
 
-    return () => unsubscribeAuth();
+    return () => {
+        unsubscribeAuth();
+        unsubscribeDoc();
+    };
   }, []);
-
-  useEffect(() => {
-    if (user) {
-      const userDocRef = doc(db, 'users', user.uid);
-      const unsubscribeDoc = onSnapshot(userDocRef, (doc) => {
-        if (doc.exists()) {
-          setUserData({ id: doc.id, ...doc.data() } as User);
-        } else {
-          setUserData(null);
-        }
-        setLoading(false);
-      });
-      return () => unsubscribeDoc();
-    }
-  }, [user]);
 
   return (
     <AuthContext.Provider value={{ user, userData, loading }}>
