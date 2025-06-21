@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChevronLeft, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, writeBatch, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -53,7 +53,6 @@ export default function AddContactPage() {
       
       const contactData = userDoc.data();
 
-      // Check if contact already exists
       const existingContactRef = doc(db, 'users', currentUser.uid, 'contacts', trimmedId);
       const existingContactSnap = await getDoc(existingContactRef);
 
@@ -67,17 +66,17 @@ export default function AddContactPage() {
           return;
       }
 
+      // Atomically add contacts for both users using a batch write
+      const batch = writeBatch(db);
+      const timestamp = serverTimestamp();
 
-      const contactRef = doc(db, 'users', currentUser.uid, 'contacts', trimmedId);
-      await setDoc(contactRef, {
-        addedAt: new Date(),
-      });
+      const newContactForCurrentUserRef = doc(db, 'users', currentUser.uid, 'contacts', trimmedId);
+      batch.set(newContactForCurrentUserRef, { addedAt: timestamp });
 
-      // Also add current user to the other person's contact list
-      const currentUserAsContactRef = doc(db, 'users', trimmedId, 'contacts', currentUser.uid);
-      await setDoc(currentUserAsContactRef, {
-        addedAt: new Date(),
-      });
+      const currentUserForNewContactRef = doc(db, 'users', trimmedId, 'contacts', currentUser.uid);
+      batch.set(currentUserForNewContactRef, { addedAt: timestamp });
+
+      await batch.commit();
 
       toast({
         title: 'Success!',

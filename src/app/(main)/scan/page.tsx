@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, VideoOff, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, writeBatch, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/hooks/useAuth';
 import { Html5Qrcode, Html5QrcodeScannerState } from 'html5-qrcode';
@@ -77,11 +77,16 @@ export default function ScanPage() {
             return;
         }
 
-        const contactDocRef = doc(db, 'users', currentUser.uid, 'contacts', contactId);
-        await setDoc(contactDocRef, { addedAt: new Date() });
+        const batch = writeBatch(db);
+        const timestamp = serverTimestamp();
 
-        const currentUserAsContactRef = doc(db, 'users', contactId, 'contacts', currentUser.uid);
-        await setDoc(currentUserAsContactRef, { addedAt: new Date() });
+        const newContactForCurrentUserRef = doc(db, 'users', currentUser.uid, 'contacts', contactId);
+        batch.set(newContactForCurrentUserRef, { addedAt: timestamp });
+
+        const currentUserForNewContactRef = doc(db, 'users', contactId, 'contacts', currentUser.uid);
+        batch.set(currentUserForNewContactRef, { addedAt: timestamp });
+        
+        await batch.commit();
 
         toast({
             title: 'Contact Added!',
