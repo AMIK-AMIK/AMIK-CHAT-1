@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from 'next/navigation';
+import { useRef } from 'react';
 import QRCode from 'react-qr-code';
 import { useAuth } from '@/hooks/useAuth';
 import { ChevronLeft, MoreHorizontal, MessageCircle } from 'lucide-react';
@@ -8,12 +9,55 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useToast } from '@/hooks/use-toast';
 
 export default function QrCodePage() {
   const router = useRouter();
   const { user, userData } = useAuth();
+  const qrCodeRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
 
   const qrValue = user ? `amik-chat-user://${user.uid}` : '';
+
+  const handleSaveImage = () => {
+    if (!qrCodeRef.current) {
+        toast({ variant: 'destructive', title: 'Error', description: 'Could not save QR code.' });
+        return;
+    };
+
+    const svgElement = qrCodeRef.current.querySelector('svg');
+    if (!svgElement) {
+        toast({ variant: 'destructive', title: 'Error', description: 'Could not find QR code element.' });
+        return;
+    }
+    
+    const svgData = new XMLSerializer().serializeToString(svgElement);
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+        toast({ variant: 'destructive', title: 'Error', description: 'Could not create image.' });
+        return;
+    }
+    
+    const img = new Image();
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+      const pngFile = canvas.toDataURL("image/png");
+      
+      const downloadLink = document.createElement("a");
+      downloadLink.download = `amik-chat-qr-${userData?.name || user?.uid}.png`;
+      downloadLink.href = pngFile;
+      downloadLink.click();
+
+      toast({ title: 'Success', description: 'QR Code saved to downloads.' });
+    };
+    img.onerror = () => {
+       toast({ variant: 'destructive', title: 'Error', description: 'Could not load QR code for saving.' });
+    }
+    img.src = `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svgData)))}`;
+  };
 
   return (
     <div className="flex h-screen flex-col bg-background">
@@ -41,7 +85,7 @@ export default function QrCodePage() {
                 </div>
               </div>
 
-              <div className="bg-white p-4 rounded-lg shadow-md relative">
+              <div ref={qrCodeRef} className="bg-white p-4 rounded-lg shadow-md relative">
                   <QRCode
                     value={qrValue}
                     size={256}
@@ -77,7 +121,7 @@ export default function QrCodePage() {
             <Separator orientation="vertical" className="h-4" />
             <Button variant="link" className="text-muted-foreground hover:text-primary px-2">Change Style</Button>
             <Separator orientation="vertical" className="h-4" />
-            <Button variant="link" className="text-muted-foreground hover:text-primary px-2">Save Image</Button>
+            <Button variant="link" className="text-muted-foreground hover:text-primary px-2" onClick={handleSaveImage}>Save Image</Button>
           </div>
         </footer>
       </main>

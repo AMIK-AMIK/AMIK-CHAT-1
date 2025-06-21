@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, VideoOff } from 'lucide-react';
+import { ChevronLeft, VideoOff, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -19,9 +19,10 @@ export default function ScanPage() {
   const readerRef = useRef<HTMLDivElement>(null);
   const [isScanning, setIsScanning] = useState(false);
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
-    if (!readerRef.current) return;
+    if (!readerRef.current || scannerRef.current) return;
 
     const qrScanner = new Html5Qrcode(readerRef.current.id);
     scannerRef.current = qrScanner;
@@ -43,8 +44,9 @@ export default function ScanPage() {
             rememberLastUsedCamera: true,
           },
           (decodedText, _decodedResult) => {
-            stopScanning();
-            handleScannedCode(decodedText);
+            if (!isProcessing) {
+                handleScannedCode(decodedText);
+            }
           },
           (errorMessage) => {
             // parse error, ignore it.
@@ -66,24 +68,23 @@ export default function ScanPage() {
     startScanning();
 
     return () => {
-      stopScanning();
+      const qrScanner = scannerRef.current;
+      if (qrScanner && qrScanner.getState() === Html5QrcodeScannerState.SCANNING) {
+        qrScanner.stop().catch(err => console.error("Error stopping scanner:", err));
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [readerRef]);
+  }, [readerRef, isProcessing]);
 
-  const stopScanning = () => {
-    const qrScanner = scannerRef.current;
-    if (qrScanner && qrScanner.getState() === Html5QrcodeScannerState.SCANNING) {
-      qrScanner.stop().then(() => {
-        setIsScanning(false);
-      }).catch(err => {
-        console.error("Error stopping scanner:", err);
-      });
-    }
-  };
 
   const handleScannedCode = async (code: string) => {
     if (!currentUser) return;
+
+    setIsProcessing(true);
+    if (scannerRef.current?.isScanning) {
+        scannerRef.current.stop();
+    }
+    
     if (!code.startsWith('amik-chat-user://')) {
       toast({
         variant: 'destructive',
@@ -135,6 +136,8 @@ export default function ScanPage() {
         description: 'Something went wrong. Please try again.',
       });
       router.push('/chats');
+    } finally {
+        setIsProcessing(false);
     }
   };
 
@@ -161,10 +164,17 @@ export default function ScanPage() {
             </Alert>
           </div>
         )}
+
+        {isProcessing && (
+          <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center text-white">
+            <Loader2 className="h-16 w-16 animate-spin mb-4" />
+            <p>Adding contact...</p>
+          </div>
+        )}
         
-        <p className="mt-4 text-center text-white">
+        {!isProcessing && <p className="mt-4 text-center text-white">
           {isScanning ? 'Place a QR code inside the frame to scan it.' : 'Initializing scanner...'}
-        </p>
+        </p>}
       </main>
     </div>
   );
