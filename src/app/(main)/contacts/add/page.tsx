@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChevronLeft, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { doc, getDoc, writeBatch, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -62,21 +62,14 @@ export default function AddContactPage() {
               description: `${contactData.name} is already in your contacts.`,
           });
           setContactId('');
-          router.push('/contacts');
+          setLoading(false);
           return;
       }
 
-      // Atomically add contacts for both users using a batch write
-      const batch = writeBatch(db);
-      const timestamp = serverTimestamp();
-
-      const newContactForCurrentUserRef = doc(db, 'users', currentUser.uid, 'contacts', trimmedId);
-      batch.set(newContactForCurrentUserRef, { addedAt: timestamp });
-
-      const currentUserForNewContactRef = doc(db, 'users', trimmedId, 'contacts', currentUser.uid);
-      batch.set(currentUserForNewContactRef, { addedAt: timestamp });
-
-      await batch.commit();
+      // Add the new contact to the current user's list.
+      // This is a one-way add to prevent security rule violations.
+      const newContactRef = doc(db, 'users', currentUser.uid, 'contacts', trimmedId);
+      await setDoc(newContactRef, { addedAt: serverTimestamp() });
 
       toast({
         title: 'Success!',
