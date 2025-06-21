@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -30,7 +31,7 @@ export default function ChatView({ chat }: { chat: Chat }) {
     const message: Message = {
       id: `msg-${Date.now()}`,
       text: newMessage,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      timestamp: format(new Date(), 'p'),
       senderId: currentUser.id,
       isRead: true,
     };
