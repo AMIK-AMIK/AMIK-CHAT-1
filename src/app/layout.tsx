@@ -3,7 +3,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: 'ChatSnap',
+  title: 'AMIK CHAT',
   description: 'A modern chat application',
 };
 

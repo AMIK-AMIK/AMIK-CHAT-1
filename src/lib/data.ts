@@ -9,7 +9,7 @@ export const currentUser: User = {
 export const contacts: User[] = [
   { id: 'user-2', name: 'Alice', avatarUrl: `https://placehold.co/100x100` },
   { id: 'user-3', name: 'Service Notifications', avatarUrl: `https://placehold.co/100x100` },
-  { id: 'user-4', name: 'ChatSnap Team', avatarUrl: `https://placehold.co/100x100` },
+  { id: 'user-4', name: 'AMIK CHAT Team', avatarUrl: `https://placehold.co/100x100` },
   { id: 'user-5', name: 'Bob', avatarUrl: `https://placehold.co/100x100` },
   { id: 'user-6', name: 'Charlie', avatarUrl: `https://placehold.co/100x100` },
   { id: 'user-7', name: 'David', avatarUrl: `https://placehold.co/100x100` },
@@ -36,7 +36,7 @@ export const chats: Chat[] = [
     id: 'chat-3',
     participants: [currentUser, contacts[2]],
     messages: [
-      { id: 'msg-3-1', text: 'Welcome to ChatSnap! Let us know if you need help.', timestamp: '6/12/25', senderId: 'user-4', isRead: true },
+      { id: 'msg-3-1', text: 'Welcome to AMIK CHAT! Let us know if you need help.', timestamp: '6/12/25', senderId: 'user-4', isRead: true },
     ],
   },
   {

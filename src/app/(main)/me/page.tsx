@@ -30,7 +30,7 @@ export default function MePage() {
           </Avatar>
           <div>
             <p className="text-xl font-semibold">{currentUser.name}</p>
-            <p className="text-muted-foreground">ChatSnap ID: {currentUser.id}</p>
+            <p className="text-muted-foreground">AMIK CHAT ID: {currentUser.id}</p>
           </div>
         </div>
 

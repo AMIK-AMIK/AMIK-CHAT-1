@@ -23,7 +23,7 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <MessageCircle className="mx-auto h-16 w-16 text-primary" />
-          <h1 className="text-4xl font-bold mt-4">ChatSnap</h1>
+          <h1 className="text-4xl font-bold mt-4">AMIK CHAT</h1>
         </div>
         <Card>
           <CardHeader>
