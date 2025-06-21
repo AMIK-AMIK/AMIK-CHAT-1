@@ -16,7 +16,7 @@ export default function ChatPage({ params }: { params: { id: string } }) {
 
   return (
     <div className="flex h-full flex-col">
-      <header className="sticky top-0 z-10 flex items-center gap-4 border-b bg-background/80 p-3 backdrop-blur-sm">
+      <header className="sticky top-0 z-10 flex items-center gap-4 border-b bg-background p-3">
         <Link href="/chats" className="p-1 rounded-md hover:bg-muted">
           <ChevronLeft className="h-6 w-6" />
         </Link>
