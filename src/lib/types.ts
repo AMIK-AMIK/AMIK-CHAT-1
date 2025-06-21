@@ -7,7 +7,7 @@ export type User = {
 export type Message = {
   id: string;
   text: string;
-  timestamp: string;
+  timestamp: any; // Allow for Firebase ServerTimestamp
   senderId: string;
   isRead: boolean;
 };
@@ -15,5 +15,6 @@ export type Message = {
 export type Chat = {
   id: string;
   participants: User[];
-  messages: Message[];
+  participantIds: string[];
+  lastMessage?: Message | null;
 };

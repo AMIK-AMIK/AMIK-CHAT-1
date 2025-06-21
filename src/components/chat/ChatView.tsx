@@ -1,21 +1,34 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import type { Chat, Message } from "@/lib/types";
-import { currentUser } from "@/lib/data";
+import type { Message } from "@/lib/types";
+import { currentUserId } from "@/lib/data";
 import { SendHorizonal } from "lucide-react";
 import MessageBubble from "./MessageBubble";
 import { Label } from "@/components/ui/label";
+import { db } from "@/lib/firebase";
+import { collection, addDoc, serverTimestamp, query, orderBy, onSnapshot } from "firebase/firestore";
 
-export default function ChatView({ chat }: { chat: Chat }) {
-  const [messages, setMessages] = useState<Message[]>(chat.messages);
+export default function ChatView({ chatId }: { chatId: string }) {
+  const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    const q = query(collection(db, `chats/${chatId}/messages`), orderBy("timestamp", "asc"));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const msgs = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Message));
+      setMessages(msgs);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [chatId]);
+  
   useEffect(() => {
     if (scrollAreaRef.current) {
       const viewport = scrollAreaRef.current.querySelector('div[data-radix-scroll-area-viewport]');
@@ -25,27 +38,30 @@ export default function ChatView({ chat }: { chat: Chat }) {
     }
   }, [messages]);
 
-  const handleSendMessage = (e: React.FormEvent) => {
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newMessage.trim() === "") return;
     
-    const message: Message = {
-      id: `msg-${Date.now()}`,
-      text: newMessage,
-      timestamp: format(new Date(), 'p'),
-      senderId: currentUser.id,
-      isRead: true,
-    };
-
-    setMessages([...messages, message]);
+    const messageText = newMessage;
     setNewMessage("");
+
+    await addDoc(collection(db, `chats/${chatId}/messages`), {
+      text: messageText,
+      senderId: currentUserId,
+      timestamp: serverTimestamp(),
+      isRead: false, // Default value
+    });
   };
 
   return (
     <div className="flex h-full flex-col">
       <ScrollArea className="flex-1" ref={scrollAreaRef}>
         <div className="space-y-4 p-4">
-          {messages.map((message) => (
+          {loading ? (
+             <p className="text-center text-muted-foreground">Loading messages...</p>
+          ) : messages.length === 0 ? (
+            <p className="text-center text-muted-foreground">No messages yet. Start the conversation!</p>
+          ) : messages.map((message) => (
             <MessageBubble key={message.id} message={message} />
           ))}
         </div>

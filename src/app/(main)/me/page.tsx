@@ -5,11 +5,28 @@ import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { currentUser } from "@/lib/data";
 import { ChevronRight, LogOut, Settings, UserCircle } from "lucide-react";
+import { useEffect, useState } from "react";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import { currentUserId } from "@/lib/data";
+import type { User } from "@/lib/types";
+import { Skeleton } from "@/components/ui/skeleton";
+
 
 export default function MePage() {
   const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const userDoc = await getDoc(doc(db, 'users', currentUserId));
+      if (userDoc.exists()) {
+        setUser({id: userDoc.id, ...userDoc.data()} as User);
+      }
+    }
+    fetchUser();
+  }, [])
 
   const handleLogout = () => {
     // In a real app, clear session/token here
@@ -23,16 +40,26 @@ export default function MePage() {
       </header>
 
       <div className="p-4 space-y-6">
-        <div className="flex items-center gap-4">
-          <Avatar className="h-20 w-20 border">
-            <AvatarImage src={currentUser.avatarUrl} alt={currentUser.name} data-ai-hint="profile person" />
-            <AvatarFallback className="text-3xl">{currentUser.name.charAt(0)}</AvatarFallback>
-          </Avatar>
-          <div>
-            <p className="text-xl font-semibold">{currentUser.name}</p>
-            <p className="text-muted-foreground">AMIK CHAT ID: {currentUser.id}</p>
+        {user ? (
+          <div className="flex items-center gap-4">
+            <Avatar className="h-20 w-20 border">
+              <AvatarImage src={user.avatarUrl} alt={user.name} data-ai-hint="profile person" />
+              <AvatarFallback className="text-3xl">{user.name.charAt(0)}</AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="text-xl font-semibold">{user.name}</p>
+              <p className="text-muted-foreground">AMIK CHAT ID: {user.id}</p>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="flex items-center gap-4">
+            <Skeleton className="h-20 w-20 rounded-full" />
+            <div className="space-y-2">
+              <Skeleton className="h-6 w-32" />
+              <Skeleton className="h-4 w-40" />
+            </div>
+          </div>
+        )}
 
         <Card>
           <CardContent className="p-0">

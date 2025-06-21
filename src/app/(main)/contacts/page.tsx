@@ -1,21 +1,5 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { contacts } from "@/lib/data";
+import { Users } from "lucide-react";
 import ContactSuggestions from "@/components/contacts/ContactSuggestions";
-import type { User } from "@/lib/types";
-
-function ContactItem({ contact }: { contact: User }) {
-  return (
-    <div className="flex items-center gap-4 p-4">
-      <Avatar className="h-12 w-12 border">
-        <AvatarImage src={contact.avatarUrl} alt={contact.name} data-ai-hint="person avatar" />
-        <AvatarFallback>{contact.name.charAt(0)}</AvatarFallback>
-      </Avatar>
-      <div className="flex-1">
-        <p className="font-semibold">{contact.name}</p>
-      </div>
-    </div>
-  );
-}
 
 export default function ContactsPage() {
   return (
@@ -29,11 +13,11 @@ export default function ContactsPage() {
       </div>
 
       <div className="border-t">
-        <h2 className="p-4 text-sm font-semibold text-muted-foreground">My Contacts ({contacts.length})</h2>
-        <div className="divide-y">
-          {contacts.map(contact => (
-            <ContactItem key={contact.id} contact={contact} />
-          ))}
+        <h2 className="p-4 text-sm font-semibold text-muted-foreground">My Contacts</h2>
+        <div className="flex flex-col items-center justify-center p-8 text-center text-muted-foreground">
+          <Users className="h-16 w-16 mb-4" />
+          <h3 className="text-lg font-semibold">Contacts coming soon</h3>
+          <p className="text-sm">This feature is currently under development.</p>
         </div>
       </div>
     </div>

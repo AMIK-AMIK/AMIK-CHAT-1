@@ -1,9 +1,9 @@
 import type { Message } from "@/lib/types";
-import { currentUser } from "@/lib/data";
+import { currentUserId } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
 export default function MessageBubble({ message }: { message: Message }) {
-  const isSentByMe = message.senderId === currentUser.id;
+  const isSentByMe = message.senderId === currentUserId;
 
   return (
     <div className={cn("flex items-end gap-2", isSentByMe ? "justify-end" : "justify-start")}>
