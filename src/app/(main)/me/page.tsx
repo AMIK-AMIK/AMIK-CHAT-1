@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ChevronRight, LogOut, Settings, UserCircle } from "lucide-react";
+import { ChevronRight, LogOut, Settings, UserCircle, QrCode } from "lucide-react";
 import { useEffect, useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -46,10 +46,13 @@ export default function MePage() {
               <AvatarImage src={user.avatarUrl} alt={user.name} data-ai-hint="profile person" />
               <AvatarFallback className="text-3xl">{user.name.charAt(0)}</AvatarFallback>
             </Avatar>
-            <div>
+            <div className="flex-1">
               <p className="text-xl font-semibold">{user.name}</p>
               <p className="text-muted-foreground">AMIK CHAT ID: {user.id}</p>
             </div>
+            <Link href="/qr" className="p-2 rounded-md hover:bg-muted">
+              <QrCode className="h-6 w-6 text-muted-foreground" />
+            </Link>
           </div>
         ) : (
           <div className="flex items-center gap-4">
