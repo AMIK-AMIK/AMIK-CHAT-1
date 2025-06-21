@@ -2,7 +2,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { chats, currentUser } from "@/lib/data";
 import Link from "next/link";
 import type { Chat } from "@/lib/types";
-import { Plus, Search } from "lucide-react";
+import { PlusCircle, Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 function ChatItem({ chat }: { chat: Chat }) {
   const otherParticipant = chat.participants.find(p => p.id !== currentUser.id);
@@ -21,7 +22,7 @@ function ChatItem({ chat }: { chat: Chat }) {
             <AvatarFallback>{otherParticipant.name.charAt(0)}</AvatarFallback>
           </Avatar>
           {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-destructive p-0.5 text-[10px] text-destructive-foreground">
+            <span className="absolute top-0 right-0 flex h-5 w-5 items-center justify-center rounded-full border-2 border-background bg-destructive text-xs text-destructive-foreground">
               {unreadCount}
             </span>
           )}
@@ -43,9 +44,15 @@ export default function ChatsPage() {
     <div>
       <header className="sticky top-0 z-10 flex items-center justify-between border-b bg-background p-4">
         <h1 className="text-xl font-bold">AMIK CHAT</h1>
-        <div className="flex items-center gap-5">
-            <Search className="h-5 w-5 text-foreground" />
-            <Plus className="h-6 w-6 text-foreground" />
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="icon" className="h-8 w-8">
+            <Search className="h-5 w-5" />
+            <span className="sr-only">Search</span>
+          </Button>
+          <Button variant="ghost" size="icon" className="h-8 w-8">
+            <PlusCircle className="h-5 w-5" />
+            <span className="sr-only">New Chat</span>
+          </Button>
         </div>
       </header>
       <div className="divide-y">
