@@ -28,16 +28,6 @@ export default function LoginPage() {
     const email = target.email.value;
     const password = target.password.value;
 
-    if (!process.env.NEXT_PUBLIC_FIREBASE_API_KEY || process.env.NEXT_PUBLIC_FIREBASE_API_KEY === "YOUR_API_KEY_HERE") {
-      toast({
-        variant: "destructive",
-        title: "Configuration Error",
-        description: "Firebase is not configured. Please add your credentials to the .env file.",
-      });
-      setLoading(false);
-      return;
-    }
-
     try {
       await signInWithEmailAndPassword(auth, email, password);
       router.push('/chats');
