@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -6,12 +7,13 @@ import { useRouter } from 'next/navigation';
 import { Users, UserPlus, Loader2 } from "lucide-react";
 import ContactSuggestions from "@/components/contacts/ContactSuggestions";
 import { Button } from "@/components/ui/button";
-import { collection, doc, getDoc, onSnapshot, query, where, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, doc, getDoc, onSnapshot, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/hooks/useAuth';
 import type { User } from '@/lib/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useToast } from "@/hooks/use-toast";
 
 function ContactItem({ contact, onClick, isCreatingChat }: { contact: User; onClick: () => void; isCreatingChat: boolean; }) {
   return (
@@ -37,6 +39,7 @@ export default function ContactsPage() {
   const { user: currentUser, userData } = useAuth();
   const router = useRouter();
   const [creatingChat, setCreatingChat] = useState<string | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (!currentUser) {
@@ -73,19 +76,16 @@ export default function ContactsPage() {
     if (!currentUser || !userData || creatingChat) return;
     setCreatingChat(contact.id);
 
+    // Create a deterministic chat ID from sorted user IDs
     const participantIds = [currentUser.uid, contact.id].sort();
+    const chatId = participantIds.join('_');
 
     try {
-      // Check if a chat already exists
-      const q = query(collection(db, 'chats'), where('participantIds', '==', participantIds));
-      const querySnapshot = await getDocs(q);
+      const chatDocRef = doc(db, 'chats', chatId);
+      const chatDocSnap = await getDoc(chatDocRef);
 
-      if (!querySnapshot.empty) {
-        // Chat exists, navigate to it
-        const chatId = querySnapshot.docs[0].id;
-        router.push(`/chats/${chatId}`);
-      } else {
-        // Chat doesn't exist, create it
+      if (!chatDocSnap.exists()) {
+        // Chat doesn't exist, create it with the deterministic ID
         const newChatData = {
           participantIds: participantIds,
           participantsInfo: {
@@ -101,11 +101,18 @@ export default function ContactsPage() {
           createdAt: serverTimestamp(),
           lastMessage: null,
         };
-        const newChatRef = await addDoc(collection(db, 'chats'), newChatData);
-        router.push(`/chats/${newChatRef.id}`);
+        await setDoc(chatDocRef, newChatData);
       }
+      
+      router.push(`/chats/${chatId}`);
+
     } catch (error) {
       console.error("Error creating or finding chat: ", error);
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Could not start the chat. Please try again.',
+      });
     } finally {
       setCreatingChat(null);
     }
