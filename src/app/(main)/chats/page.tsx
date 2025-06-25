@@ -19,8 +19,15 @@ function ChatItem({ chat, currentUserId }: { chat: Chat; currentUserId: string }
   const otherParticipantId = chat.participantIds.find(id => id !== currentUserId);
   const otherParticipant = otherParticipantId ? chat.participantsInfo[otherParticipantId] : null;
   const [time, setTime] = useState('');
+  const [hasMounted, setHasMounted] = useState(false);
 
   useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hasMounted) return;
+
     let timeoutId: NodeJS.Timeout;
     const updateFuzzyTime = () => {
       if (chat.lastMessage?.timestamp) {
@@ -38,7 +45,7 @@ function ChatItem({ chat, currentUserId }: { chat: Chat; currentUserId: string }
 
     updateFuzzyTime();
     return () => clearTimeout(timeoutId);
-  }, [chat.lastMessage?.timestamp]);
+  }, [chat.lastMessage?.timestamp, hasMounted]);
 
   if (!otherParticipant) return null;
 
@@ -52,7 +59,7 @@ function ChatItem({ chat, currentUserId }: { chat: Chat; currentUserId: string }
         <div className="flex-1 overflow-hidden">
           <div className="flex justify-between items-center">
             <p className="font-semibold truncate text-base">{otherParticipant.name}</p>
-            {chat.lastMessage && <p className="text-xs text-muted-foreground">{time}</p>}
+            {hasMounted && chat.lastMessage && <p className="text-xs text-muted-foreground">{time}</p>}
           </div>
           <p className="text-sm text-muted-foreground truncate">{chat.lastMessage?.text || 'No messages yet'}</p>
         </div>
