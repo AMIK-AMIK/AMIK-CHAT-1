@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { collection, doc, getDoc, onSnapshot, setDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, doc, getDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/hooks/useAuth';
 import type { User } from '@/lib/types';
@@ -12,6 +12,7 @@ import { ChevronLeft, Loader2 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
+import { createOrNavigateToChat } from '@/lib/chatUtils';
 
 export default function NewChatPage() {
   const [contacts, setContacts] = useState<User[]>([]);
@@ -37,7 +38,7 @@ export default function NewChatPage() {
           .filter(doc => doc.exists())
           .map(doc => ({ id: doc.id, ...doc.data() } as User));
         setContacts(contactsData);
-      } catch (error)_ {
+      } catch (error) {
         console.error("Error fetching contacts:", error);
       } finally {
         setLoading(false);
@@ -51,36 +52,9 @@ export default function NewChatPage() {
     if (!currentUser || !userData) return;
     setCreatingChat(contact.id);
     
-    // Create a deterministic chat ID from sorted user IDs
-    const participantIds = [currentUser.uid, contact.id].sort();
-    const chatId = participantIds.join('_');
-
     try {
-      const chatDocRef = doc(db, 'chats', chatId);
-      const chatDocSnap = await getDoc(chatDocRef);
-
-      if (!chatDocSnap.exists()) {
-        // Chat doesn't exist, create it with the deterministic ID
-        const newChatData = {
-          participantIds: participantIds,
-          participantsInfo: {
-            [currentUser.uid]: {
-              name: userData.name,
-              avatarUrl: userData.avatarUrl,
-            },
-            [contact.id]: {
-              name: contact.name,
-              avatarUrl: contact.avatarUrl,
-            },
-          },
-          createdAt: serverTimestamp(),
-          lastMessage: null,
-        };
-        await setDoc(chatDocRef, newChatData);
-      }
-      
+      const chatId = await createOrNavigateToChat(currentUser.uid, userData, contact);
       router.push(`/chats/${chatId}`);
-
     } catch (error: any) {
       console.error("Error creating or finding chat: ", error);
       toast({

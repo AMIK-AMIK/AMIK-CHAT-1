@@ -7,13 +7,14 @@ import { useRouter } from 'next/navigation';
 import { Users, UserPlus, Loader2 } from "lucide-react";
 import ContactSuggestions from "@/components/contacts/ContactSuggestions";
 import { Button } from "@/components/ui/button";
-import { collection, doc, getDoc, onSnapshot, setDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, doc, getDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/hooks/useAuth';
 import type { User } from '@/lib/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from "@/hooks/use-toast";
+import { createOrNavigateToChat } from '@/lib/chatUtils';
 
 function ContactItem({ contact, onClick, isCreatingChat }: { contact: User; onClick: () => void; isCreatingChat: boolean; }) {
   return (
@@ -76,36 +77,9 @@ export default function ContactsPage() {
     if (!currentUser || !userData || creatingChat) return;
     setCreatingChat(contact.id);
 
-    // Create a deterministic chat ID from sorted user IDs
-    const participantIds = [currentUser.uid, contact.id].sort();
-    const chatId = participantIds.join('_');
-
     try {
-      const chatDocRef = doc(db, 'chats', chatId);
-      const chatDocSnap = await getDoc(chatDocRef);
-
-      if (!chatDocSnap.exists()) {
-        // Chat doesn't exist, create it with the deterministic ID
-        const newChatData = {
-          participantIds: participantIds,
-          participantsInfo: {
-            [currentUser.uid]: {
-              name: userData.name,
-              avatarUrl: userData.avatarUrl,
-            },
-            [contact.id]: {
-              name: contact.name,
-              avatarUrl: contact.avatarUrl,
-            },
-          },
-          createdAt: serverTimestamp(),
-          lastMessage: null,
-        };
-        await setDoc(chatDocRef, newChatData);
-      }
-      
+      const chatId = await createOrNavigateToChat(currentUser.uid, userData, contact);
       router.push(`/chats/${chatId}`);
-
     } catch (error: any) {
       console.error("Error creating or finding chat: ", error);
       toast({
