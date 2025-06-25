@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { db } from '@/lib/firebase';
-import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import type { Chat } from '@/lib/types';
 import { useAuth } from '@/hooks/useAuth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -72,13 +72,11 @@ export default function ChatsPage() {
   useEffect(() => {
     if (!currentUser) return;
     
-    // This query is now much more efficient.
-    // NOTE: Firestore may require a composite index for this query.
-    // The console error will provide a link to create it easily.
+    // Fetch chats without ordering to avoid needing a composite index.
+    // We will sort the chats on the client-side.
     const q = query(
       collection(db, 'chats'),
-      where('participantIds', 'array-contains', currentUser.uid),
-      orderBy('lastMessage.timestamp', 'desc')
+      where('participantIds', 'array-contains', currentUser.uid)
     );
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
@@ -88,7 +86,7 @@ export default function ChatsPage() {
           ...doc.data()
       })) as Chat[];
       
-      // Fallback sort for chats with no messages (lastMessage.timestamp is null)
+      // Sort chats by the most recent message timestamp.
       chatsData.sort((a, b) => {
         const timeA = a.lastMessage?.timestamp?.toDate()?.getTime() || a.createdAt?.toDate()?.getTime() || 0;
         const timeB = b.lastMessage?.timestamp?.toDate()?.getTime() || b.createdAt?.toDate()?.getTime() || 0;
@@ -100,7 +98,7 @@ export default function ChatsPage() {
     }, (error) => {
         console.error("Error fetching chats: ", error);
         setLoading(false);
-        toast({ variant: "destructive", title: "Error", description: "Could not fetch chats. You may need to create a Firestore index." });
+        toast({ variant: "destructive", title: "Error", description: "Could not fetch chats. Please check your connection or try again later." });
     });
 
     return () => unsubscribe();
