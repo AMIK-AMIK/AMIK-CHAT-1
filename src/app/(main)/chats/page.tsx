@@ -126,7 +126,7 @@ export default function ChatsPage() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onSelect={() => router.push('/chats/new')}>
+              <DropdownMenuItem onSelect={() => router.push('/contacts')}>
                 <MessageCircle className="mr-2 h-4 w-4" />
                 <span>New Chat</span>
               </DropdownMenuItem>
