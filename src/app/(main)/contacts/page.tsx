@@ -106,12 +106,14 @@ export default function ContactsPage() {
       
       router.push(`/chats/${chatId}`);
 
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating or finding chat: ", error);
       toast({
         variant: 'destructive',
-        title: 'Error',
-        description: 'Could not start the chat. Please try again.',
+        title: 'Error Starting Chat',
+        description: error.code === 'permission-denied' 
+          ? 'Permission denied. Please check your Firestore security rules.' 
+          : error.message || 'An unknown error occurred.',
       });
     } finally {
       setCreatingChat(null);

@@ -37,7 +37,7 @@ export default function NewChatPage() {
           .filter(doc => doc.exists())
           .map(doc => ({ id: doc.id, ...doc.data() } as User));
         setContacts(contactsData);
-      } catch (error) {
+      } catch (error)_ {
         console.error("Error fetching contacts:", error);
       } finally {
         setLoading(false);
@@ -81,12 +81,14 @@ export default function NewChatPage() {
       
       router.push(`/chats/${chatId}`);
 
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating or finding chat: ", error);
       toast({
         variant: 'destructive',
-        title: 'Error',
-        description: 'Could not start the chat. Please try again.',
+        title: 'Error Starting Chat',
+        description: error.code === 'permission-denied' 
+          ? 'Permission denied. Please check your Firestore security rules.' 
+          : error.message || 'An unknown error occurred.',
       });
     } finally {
         setCreatingChat(null);
