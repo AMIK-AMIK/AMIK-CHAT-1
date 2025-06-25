@@ -96,6 +96,17 @@ export default function MainAppLayout({
                 }
             }
         });
+    },
+    (error) => {
+      console.error("Firestore permission error in main layout:", error);
+      if (error.code === 'permission-denied') {
+        toast({
+          variant: "destructive",
+          title: "Permissions Error",
+          description: "Could not load chat data. Please ensure your Firestore security rules are set up correctly.",
+          duration: 10000,
+        });
+      }
     });
 
     return () => {
