@@ -103,7 +103,7 @@ export default function MainAppLayout({
         toast({
           variant: "destructive",
           title: "Permissions Error",
-          description: "Could not load chat data. Please check your Firestore security rules.",
+          description: "Could not load chat list. Please check your Firestore security rules to allow querying the 'chats' collection.",
           duration: 10000,
         });
       }
