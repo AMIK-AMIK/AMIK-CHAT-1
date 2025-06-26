@@ -3,21 +3,33 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
-import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, setDoc, onSnapshot, updateDoc } from 'firebase/firestore';
 import type { User } from '@/lib/types';
 
 interface AuthContextType {
   user: FirebaseUser | null;
   userData: User | null;
   loading: boolean;
+  updateProfile: (data: Partial<Omit<User, 'id'>>) => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType>({ user: null, userData: null, loading: true });
+const AuthContext = createContext<AuthContextType>({ 
+  user: null, 
+  userData: null, 
+  loading: true,
+  updateProfile: async () => {},
+});
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [userData, setUserData] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const updateProfile = async (data: Partial<Omit<User, 'id'>>) => {
+    if (!user) throw new Error("No user logged in");
+    const userDocRef = doc(db, 'users', user.uid);
+    await updateDoc(userDocRef, data);
+  };
 
   useEffect(() => {
     let unsubscribeDoc: () => void = () => {};
@@ -66,7 +78,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, userData, loading }}>
+    <AuthContext.Provider value={{ user, userData, loading, updateProfile }}>
       {children}
     </AuthContext.Provider>
   );
