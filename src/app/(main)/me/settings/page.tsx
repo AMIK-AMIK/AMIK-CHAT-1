@@ -23,7 +23,7 @@ export default function SettingsPage() {
         <Card>
           <CardContent className="p-0">
             <div className="divide-y">
-               <Link href="#" className="flex items-center p-4 transition-colors hover:bg-muted/50">
+               <Link href="/me/settings/account" className="flex items-center p-4 transition-colors hover:bg-muted/50">
                 <Shield className="mr-4 h-6 w-6 text-accent" />
                 <div className="flex-1">
                   <p className="font-medium">Account & Security</p>
