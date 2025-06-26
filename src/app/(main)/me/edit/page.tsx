@@ -11,11 +11,10 @@ import { useToast } from "@/hooks/use-toast";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ChevronLeft, Loader2 } from "lucide-react";
+import { ChevronLeft, Loader2, RefreshCw } from "lucide-react";
 
 const profileFormSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }).max(50),
@@ -55,7 +54,7 @@ export default function EditProfilePage() {
     try {
       await updateProfile({ 
         name: data.name,
-        // Use a placeholder if the URL is empty
+        // If avatarUrl is empty or not a valid URL (e.g., after clearing), generate a placeholder.
         avatarUrl: data.avatarUrl || `https://placehold.co/100x100.png?text=${data.name.charAt(0).toUpperCase()}`
       });
       toast({
@@ -73,6 +72,13 @@ export default function EditProfilePage() {
     } finally {
       setIsSubmitting(false);
     }
+  }
+  
+  const generateNewAvatar = () => {
+    const currentName = form.getValues("name") || 'A';
+    // Add a timestamp to ensure the URL is unique and bypasses browser cache
+    const newAvatar = `https://placehold.co/100x100.png?text=${currentName.charAt(0).toUpperCase()}&c=${Date.now()}`;
+    form.setValue('avatarUrl', newAvatar, { shouldDirty: true });
   }
 
   if (authLoading) {
@@ -100,19 +106,22 @@ export default function EditProfilePage() {
         <Card>
           <CardHeader>
             <CardTitle>Your Information</CardTitle>
-            <CardDescription>Update your username and avatar.</CardDescription>
+            <CardDescription>Update your username and profile photo.</CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                <div className="flex items-center gap-4">
-                   <Avatar className="h-20 w-20 border">
-                      <AvatarImage src={avatarUrl || `https://placehold.co/100x100.png?text=${(name || 'A').charAt(0)}`} alt={name} data-ai-hint="profile person"/>
-                      <AvatarFallback className="text-3xl">
+                <div className="flex flex-col items-center gap-4 pt-4">
+                   <Avatar className="h-24 w-24 border">
+                      <AvatarImage src={avatarUrl || ''} alt={name} data-ai-hint="profile person"/>
+                      <AvatarFallback className="text-4xl">
                         {(name || 'A').charAt(0).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
-                  <p className="text-sm text-muted-foreground">This is how your profile will appear to others.</p>
+                  <Button type="button" variant="outline" onClick={generateNewAvatar}>
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                    Generate New Avatar
+                  </Button>
                 </div>
 
                 <FormField
@@ -128,19 +137,7 @@ export default function EditProfilePage() {
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="avatarUrl"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Avatar URL</FormLabel>
-                      <FormControl>
-                        <Input placeholder="https://example.com/avatar.png" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                
                 <Button type="submit" disabled={isSubmitting} className="w-full">
                   {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                   Save Changes

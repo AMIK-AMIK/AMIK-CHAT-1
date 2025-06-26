@@ -68,7 +68,7 @@ export default function MePage() {
                 <span className="flex-1 font-medium">Edit Profile</span>
                 <ChevronRight className="h-5 w-5 text-muted-foreground" />
               </Link>
-              <Link href="#" className="flex items-center p-4 transition-colors hover:bg-muted/50">
+              <Link href="/me/settings" className="flex items-center p-4 transition-colors hover:bg-muted/50">
                 <Settings className="mr-4 h-6 w-6 text-accent" />
                 <span className="flex-1 font-medium">Settings</span>
                 <ChevronRight className="h-5 w-5 text-muted-foreground" />
