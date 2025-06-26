@@ -12,6 +12,7 @@ import type { User } from '@/lib/types';
 import { useAuth } from '@/hooks/useAuth';
 
 export default function ChatPage({ params }: { params: { id: string } }) {
+  const { id } = params;
   const [otherParticipant, setOtherParticipant] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const { user: currentUser } = useAuth();
@@ -22,7 +23,7 @@ export default function ChatPage({ params }: { params: { id: string } }) {
 
     const fetchChatInfo = async () => {
       try {
-        const chatDocRef = doc(db, 'chats', params.id);
+        const chatDocRef = doc(db, 'chats', id);
         const chatDoc = await getDoc(chatDocRef);
 
         if (!chatDoc.exists()) {
@@ -37,7 +38,7 @@ export default function ChatPage({ params }: { params: { id: string } }) {
             return;
         }
 
-        const otherParticipantId = chatData.participantIds.find((id: string) => id !== currentUser.uid);
+        const otherParticipantId = chatData.participantIds.find((participantId: string) => participantId !== currentUser.uid);
 
         if (otherParticipantId && chatData.participantsInfo) {
           const otherInfo = chatData.participantsInfo[otherParticipantId];
@@ -66,13 +67,13 @@ export default function ChatPage({ params }: { params: { id: string } }) {
     };
 
     fetchChatInfo();
-  }, [params.id, currentUser, router]);
+  }, [id, currentUser, router]);
 
   useEffect(() => {
-    if (!currentUser || !params.id) return;
+    if (!currentUser || !id) return;
 
     const markMessagesAsRead = async () => {
-      const messagesRef = collection(db, 'chats', params.id, 'messages');
+      const messagesRef = collection(db, 'chats', id, 'messages');
       const q = query(messagesRef, where('senderId', '!=', currentUser.uid), where('isRead', '==', false));
       const querySnapshot = await getDocs(q);
       
@@ -84,14 +85,14 @@ export default function ChatPage({ params }: { params: { id: string } }) {
       });
 
       // Also update the isRead status on the denormalized lastMessage on the chat document
-      const chatRef = doc(db, 'chats', params.id);
+      const chatRef = doc(db, 'chats', id);
       batch.update(chatRef, { 'lastMessage.isRead': true });
       
       await batch.commit();
     };
 
     markMessagesAsRead().catch(console.error);
-  }, [params.id, currentUser]);
+  }, [id, currentUser]);
 
   if (loading) {
     return (
@@ -122,7 +123,7 @@ export default function ChatPage({ params }: { params: { id: string } }) {
           <MoreHorizontal className="h-6 w-6" />
         </button>
       </header>
-      <ChatView chatId={params.id} />
+      <ChatView chatId={id} />
     </div>
   );
 }
