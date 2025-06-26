@@ -11,7 +11,8 @@ import { db } from '@/lib/firebase';
 import type { User } from '@/lib/types';
 import { useAuth } from '@/hooks/useAuth';
 
-export default function ChatPage({ params: { id } }: { params: { id: string } }) {
+export default function ChatPage({ params }: { params: { id: string } }) {
+  const { id } = params;
   const [otherParticipant, setOtherParticipant] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const { user: currentUser } = useAuth();
@@ -73,8 +74,8 @@ export default function ChatPage({ params: { id } }: { params: { id: string } })
 
     const markMessagesAsRead = async () => {
       const messagesRef = collection(db, 'chats', id, 'messages');
-      const q = query(messagesRef, where('isRead', '==', false));
-      const querySnapshot = await getDocs(q);
+      const unreadMessagesQuery = query(messagesRef, where('isRead', '==', false));
+      const querySnapshot = await getDocs(unreadMessagesQuery);
       
       if (querySnapshot.empty) return;
 
