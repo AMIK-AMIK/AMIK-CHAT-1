@@ -1,6 +1,7 @@
 "use client";
 
-import { useFormState, useFormStatus } from "react-dom";
+import { useActionState } from "react";
+import { useFormStatus } from "react-dom";
 import { suggestContacts } from "@/ai/flows/suggest-contacts";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,7 +25,7 @@ function SubmitButton() {
 }
 
 export default function ContactSuggestions() {
-  const [state, formAction] = useFormState(suggestContacts, initialState);
+  const [state, formAction] = useActionState(suggestContacts, initialState);
 
   return (
     <Card>
