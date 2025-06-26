@@ -73,19 +73,30 @@ export default function ChatPage({ params: { id } }: { params: { id: string } })
 
     const markMessagesAsRead = async () => {
       const messagesRef = collection(db, 'chats', id, 'messages');
-      const q = query(messagesRef, where('senderId', '!=', currentUser.uid), where('isRead', '==', false));
+      const q = query(messagesRef, where('isRead', '==', false));
       const querySnapshot = await getDocs(q);
       
       if (querySnapshot.empty) return;
 
       const batch = writeBatch(db);
+      let needsCommit = false;
       querySnapshot.docs.forEach(doc => {
-        batch.update(doc.ref, { isRead: true });
+        if (doc.data().senderId !== currentUser.uid) {
+            batch.update(doc.ref, { isRead: true });
+            needsCommit = true;
+        }
       });
 
-      // Also update the isRead status on the denormalized lastMessage on the chat document
+      if (!needsCommit) return;
+      
       const chatRef = doc(db, 'chats', id);
-      batch.update(chatRef, { 'lastMessage.isRead': true });
+      const chatSnap = await getDoc(chatRef);
+      if (chatSnap.exists()) {
+          const chatData = chatSnap.data();
+          if (chatData.lastMessage && chatData.lastMessage.senderId !== currentUser.uid) {
+               batch.update(chatRef, { 'lastMessage.isRead': true });
+          }
+      }
       
       await batch.commit();
     };
