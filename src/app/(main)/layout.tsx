@@ -71,8 +71,7 @@ export default function MainAppLayout({
             
             toast({
               id: toastId,
-              variant: 'destructive',
-              className: "p-2 rounded-full cursor-pointer w-auto max-w-[320px] shadow-lg data-[state=open]:sm:slide-in-from-bottom-full",
+              className: "bg-primary text-primary-foreground p-2 rounded-full cursor-pointer w-auto max-w-[320px] shadow-lg data-[state=open]:sm:slide-in-from-bottom-full",
               duration: 6000,
               description: (
                 <div 
@@ -87,8 +86,8 @@ export default function MainAppLayout({
                     <AvatarFallback>{senderInfo.name.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <div className="flex-1 overflow-hidden">
-                    <p className="font-semibold text-white truncate">{senderInfo.name}</p>
-                    <p className="text-sm text-white truncate">{lastMessage.text}</p>
+                    <p className="font-semibold truncate">{senderInfo.name}</p>
+                    <p className="text-sm truncate">{lastMessage.text}</p>
                   </div>
                 </div>
               )
