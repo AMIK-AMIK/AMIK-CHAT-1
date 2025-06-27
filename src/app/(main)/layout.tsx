@@ -3,7 +3,7 @@
 import BottomNav from "@/components/BottomNav";
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter, usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { db } from "@/lib/firebase";
@@ -20,6 +20,7 @@ export default function MainAppLayout({
   const router = useRouter();
   const pathname = usePathname();
   const { toast, dismiss } = useToast();
+  const notifiedMessageKeys = useRef(new Set<string>());
 
   useEffect(() => {
     if (!loading && !user) {
@@ -29,10 +30,6 @@ export default function MainAppLayout({
 
   useEffect(() => {
     if (!user) return;
-
-    // Use a Set to track messages we've already shown notifications for in this session.
-    // This prevents spamming notifications on reconnect or for the same message.
-    const notifiedMessageKeys = new Set<string>();
 
     const chatsQuery = query(
       collection(db, 'chats'),
@@ -59,10 +56,10 @@ export default function MainAppLayout({
             const messageKey = `${chatId}-${messageTimestamp}`;
 
             // 5. We haven't already shown a notification for this exact message.
-            if (notifiedMessageKeys.has(messageKey)) {
+            if (notifiedMessageKeys.current.has(messageKey)) {
               return;
             }
-            notifiedMessageKeys.add(messageKey);
+            notifiedMessageKeys.current.add(messageKey);
 
             const senderInfo = chat.participantsInfo?.[lastMessage.senderId];
             if (!senderInfo) return;
