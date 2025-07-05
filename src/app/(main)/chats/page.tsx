@@ -40,9 +40,9 @@ function formatUrduDistanceToNow(date: Date): string {
     
     const hours = Math.floor(minutes / 60);
     if (hours < 24) {
+        if (hours === 1) return 'ایک گھنٹہ پہلے';
         const numWord = toUrduWord(hours);
-        const unit = hours === 1 ? "گھنٹہ" : "گھنٹے";
-        return `${numWord} ${unit} پہلے`;
+        return `${numWord} گھنٹے پہلے`;
     }
     
     const days = Math.floor(hours / 24);
@@ -53,9 +53,9 @@ function formatUrduDistanceToNow(date: Date): string {
 
     const months = Math.floor(days / 30);
     if (months < 12) {
+        if (months === 1) return 'ایک مہینہ پہلے';
         const numWord = toUrduWord(months);
-        const unit = months === 1 ? "مہینہ" : "مہینے";
-        return `${numWord} ${unit} پہلے`;
+        return `${numWord} مہینے پہلے`;
     }
 
     const years = Math.floor(days / 365);
@@ -168,7 +168,7 @@ export default function ChatsPage() {
   return (
     <div>
       <header className="sticky top-0 z-10 flex items-center justify-between border-b bg-background p-4">
-        <h1 className="text-xl font-bold">AMIK CHAT</h1>
+        <h1 className="text-xl font-bold">اے ایم آئی کے چیٹ</h1>
         <div className="flex items-center gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

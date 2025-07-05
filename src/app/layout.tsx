@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from '@/hooks/useAuth';
 
 export const metadata: Metadata = {
-  title: 'AMIK CHAT',
+  title: 'اے ایم آئی کے چیٹ',
   description: 'ایک جدید چیٹ ایپلیکیشن',
 };
 
