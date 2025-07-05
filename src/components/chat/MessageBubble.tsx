@@ -90,7 +90,7 @@ export default function MessageBubble({ message, translation, isTranslated, isTr
               <p className="text-base" style={{ wordBreak: 'break-word' }}>
                   {translation}
               </p>
-              <div className="flex items-center gap-1.5 text-xs opacity-80 pt-1.5 mt-1.5">
+              <div className="flex items-center gap-1.5 text-xs opacity-80 pt-1.5 mt-1.5 border-t border-t-black/10 dark:border-t-white/20">
                   <CheckCircle2 className="h-3.5 w-3.5" />
                   <span>AMIK سے ترجمہ شدہ</span>
               </div>
