@@ -75,7 +75,7 @@ export default function ChatView({ chatId }: { chatId: string }) {
   };
 
   return (
-    <div className="flex-1 flex flex-col">
+    <div className="flex-1 flex flex-col overflow-hidden">
       <ScrollArea className="flex-1" ref={scrollAreaRef}>
         <div className="space-y-4 p-4">
           {loading ? (
