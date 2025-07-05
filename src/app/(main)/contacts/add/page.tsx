@@ -100,13 +100,13 @@ export default function AddContactPage() {
           <CardHeader>
             <CardTitle>نیا رابطہ شامل کریں</CardTitle>
             <CardDescription>
-              جس صارف کو آپ شامل کرنا چاہتے ہیں اس کی منفرد AMIK CHAT ID درج کریں۔
+              جس صارف کو آپ شامل کرنا چاہتے ہیں اس کی منفرد اے ایم آئی کے گفتگو شناخت درج کریں۔
             </CardDescription>
           </CardHeader>
           <form onSubmit={handleAddContact}>
             <CardContent>
               <div className="space-y-2">
-                <Label htmlFor="contact-id">AMIK CHAT ID</Label>
+                <Label htmlFor="contact-id">اے ایم آئی کے گفتگو شناخت</Label>
                 <Input
                   id="contact-id"
                   placeholder="e.g., fJ...xZ"
