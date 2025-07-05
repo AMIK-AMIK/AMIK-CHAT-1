@@ -71,7 +71,7 @@ export default function AccountPage() {
         <Button variant="ghost" size="icon" onClick={() => router.back()}>
             <ChevronLeft className="h-6 w-6" />
         </Button>
-        <h1 className="flex-1 truncate text-lg font-semibold">اکاؤنٹ اور سیکیورٹی</h1>
+        <h1 className="flex-1 truncate text-lg font-semibold">کھاتہ اور حفاظت</h1>
       </header>
 
       <div className="p-4">
