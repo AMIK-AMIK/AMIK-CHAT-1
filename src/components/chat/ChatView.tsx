@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useRef, useEffect } from "react";
@@ -8,6 +9,7 @@ import type { Message } from "@/lib/types";
 import { useAuth } from "@/hooks/useAuth";
 import { SendHorizonal } from "lucide-react";
 import MessageBubble from "./MessageBubble";
+import ChatMessageActions from "./ChatMessageActions";
 import { Label } from "@/components/ui/label";
 import { db } from "@/lib/firebase";
 import { collection, serverTimestamp, query, orderBy, onSnapshot, writeBatch, doc, updateDoc } from "firebase/firestore";
@@ -24,6 +26,7 @@ export default function ChatView({ chatId }: { chatId: string }) {
 
   const [translations, setTranslations] = useState<Record<string, string>>({});
   const [translatingId, setTranslatingId] = useState<string | null>(null);
+  const [messageForAction, setMessageForAction] = useState<Message | null>(null);
 
   useEffect(() => {
     const q = query(collection(db, `chats/${chatId}/messages`), orderBy("timestamp", "asc"));
@@ -79,8 +82,14 @@ export default function ChatView({ chatId }: { chatId: string }) {
 
     await batch.commit();
   };
+  
+  const showComingSoonToast = () => {
+    toast({ title: "فیچر جلد آرہا ہے۔" });
+    setMessageForAction(null);
+  };
 
   const handleDeleteMessage = async (messageId: string) => {
+    setMessageForAction(null);
     const messageRef = doc(db, 'chats', chatId, 'messages', messageId);
     try {
         await updateDoc(messageRef, {
@@ -95,6 +104,7 @@ export default function ChatView({ chatId }: { chatId: string }) {
   };
 
   const handleTranslateMessage = async (messageId: string, textToTranslate: string) => {
+    setMessageForAction(null);
     setTranslatingId(messageId);
     try {
         const result = await translateText({ text: textToTranslate, targetLanguage: 'English' });
@@ -119,8 +129,7 @@ export default function ChatView({ chatId }: { chatId: string }) {
             <MessageBubble 
                 key={message.id} 
                 message={message}
-                onDelete={handleDeleteMessage}
-                onTranslate={handleTranslateMessage}
+                onShowActions={() => setMessageForAction(message)}
                 translation={translations[message.id]}
                 isTranslating={translatingId === message.id}
             />
@@ -147,6 +156,16 @@ export default function ChatView({ chatId }: { chatId: string }) {
           </Button>
         </form>
       </div>
+      <ChatMessageActions
+        message={messageForAction}
+        isOpen={!!messageForAction}
+        onClose={() => setMessageForAction(null)}
+        onDeleteForEveryone={handleDeleteMessage}
+        onTranslate={handleTranslateMessage}
+        onForward={showComingSoonToast}
+        onReact={showComingSoonToast}
+        onDeleteForMe={showComingSoonToast}
+      />
     </div>
   );
 }
