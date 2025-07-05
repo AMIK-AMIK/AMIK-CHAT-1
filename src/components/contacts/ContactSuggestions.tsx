@@ -57,7 +57,7 @@ export default function ContactSuggestions() {
           </div>
         </CardContent>
         <CardFooter className="flex flex-col-reverse sm:flex-row sm:justify-between items-center gap-4">
-           <p className="text-sm text-muted-foreground">Genkit AI سے تقویت یافتہ</p>
+           <p className="text-sm text-muted-foreground">جینیٹک اے آئی سے تقویت یافتہ</p>
           <SubmitButton />
         </CardFooter>
       </form>
@@ -68,7 +68,7 @@ export default function ContactSuggestions() {
               <Wand2 className="h-4 w-4" />
               <AlertTitle>یہاں کچھ تجاویز ہیں!</AlertTitle>
               <AlertDescription>
-                <ul className="mt-2 list-disc pr-5 space-y-1">
+                <ul className="mt-2 list-disc pl-5 space-y-1">
                   {state.suggestedContacts.map((contact, index) => (
                     <li key={index}>{contact}</li>
                   ))}
