@@ -19,36 +19,48 @@ function formatUrduDistanceToNow(date: Date): string {
     const now = new Date();
     const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
+    const urduNumbers: { [key: number]: string } = {
+        1: 'ایک', 2: 'دو', 3: 'تین', 4: 'چار', 5: 'پانچ',
+        6: 'چھ', 7: 'سات', 8: 'آٹھ', 9: 'نو', 10: 'دس',
+    };
+    const toUrduWord = (n: number) => urduNumbers[n] || String(n);
+
     if (seconds < 2) return "ابھی ابھی";
-    if (seconds < 60) return `${seconds} سیکنڈ پہلے`;
+    
+    if (seconds < 60) {
+        const numWord = toUrduWord(seconds);
+        return `${numWord} سیکنڈ پہلے`;
+    }
     
     const minutes = Math.floor(seconds / 60);
     if (minutes < 60) {
-        if (minutes === 1) return `ایک منٹ پہلے`;
-        return `${minutes} منٹ پہلے`;
+        const numWord = toUrduWord(minutes);
+        return `${numWord} منٹ پہلے`;
     }
     
     const hours = Math.floor(minutes / 60);
     if (hours < 24) {
-        if (hours === 1) return `ایک گھنٹہ پہلے`;
-        return `${hours} گھنٹے پہلے`;
+        const numWord = toUrduWord(hours);
+        const unit = hours === 1 ? "گھنٹہ" : "گھنٹے";
+        return `${numWord} ${unit} پہلے`;
     }
     
     const days = Math.floor(hours / 24);
     if (days < 30) {
-        if (days === 1) return `ایک دن پہلے`;
-        return `${days} دن پہلے`;
+        const numWord = toUrduWord(days);
+        return `${numWord} دن پہلے`;
     }
 
     const months = Math.floor(days / 30);
     if (months < 12) {
-        if (months === 1) return `ایک مہینہ پہلے`;
-        return `${months} مہینے پہلے`;
+        const numWord = toUrduWord(months);
+        const unit = months === 1 ? "مہینہ" : "مہینے";
+        return `${numWord} ${unit} پہلے`;
     }
 
     const years = Math.floor(days / 365);
-    if (years === 1) return `ایک سال پہلے`;
-    return `${years} سال پہلے`;
+    const numWord = toUrduWord(years);
+    return `${numWord} سال پہلے`;
 }
 
 function ChatItem({ chat, currentUserId }: { chat: Chat; currentUserId: string }) {
@@ -71,12 +83,12 @@ function ChatItem({ chat, currentUserId }: { chat: Chat; currentUserId: string }
           const date = chat.lastMessage.timestamp.toDate();
           setTime(formatUrduDistanceToNow(date));
         } catch (e) {
-          setTime('ابھی ابھی');
+          setTime('');
         }
       } else {
         setTime('');
       }
-      timeoutId = setTimeout(updateFuzzyTime, 60000); // update every minute
+      timeoutId = setTimeout(updateFuzzyTime, 60000);
     };
 
     updateFuzzyTime();
