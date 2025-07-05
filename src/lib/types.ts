@@ -12,6 +12,7 @@ export type Message = {
   timestamp: Timestamp;
   senderId: string;
   isRead: boolean;
+  isDeleted?: boolean;
 };
 
 export type Chat = {

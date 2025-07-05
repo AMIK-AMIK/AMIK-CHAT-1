@@ -10,7 +10,9 @@ import { SendHorizonal } from "lucide-react";
 import MessageBubble from "./MessageBubble";
 import { Label } from "@/components/ui/label";
 import { db } from "@/lib/firebase";
-import { collection, serverTimestamp, query, orderBy, onSnapshot, writeBatch, doc } from "firebase/firestore";
+import { collection, serverTimestamp, query, orderBy, onSnapshot, writeBatch, doc, updateDoc } from "firebase/firestore";
+import { translateText } from "@/ai/flows/translate-text";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ChatView({ chatId }: { chatId: string }) {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -18,6 +20,10 @@ export default function ChatView({ chatId }: { chatId: string }) {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
   const { user: currentUser } = useAuth();
+  const { toast } = useToast();
+
+  const [translations, setTranslations] = useState<Record<string, string>>({});
+  const [translatingId, setTranslatingId] = useState<string | null>(null);
 
   useEffect(() => {
     const q = query(collection(db, `chats/${chatId}/messages`), orderBy("timestamp", "asc"));
@@ -37,7 +43,7 @@ export default function ChatView({ chatId }: { chatId: string }) {
         viewport.scrollTop = viewport.scrollHeight;
       }
     }
-  }, [messages]);
+  }, [messages, translations]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,6 +80,33 @@ export default function ChatView({ chatId }: { chatId: string }) {
     await batch.commit();
   };
 
+  const handleDeleteMessage = async (messageId: string) => {
+    const messageRef = doc(db, 'chats', chatId, 'messages', messageId);
+    try {
+        await updateDoc(messageRef, {
+            text: 'یہ پیغام حذف کر دیا گیا',
+            isDeleted: true,
+        });
+        toast({ title: 'پیغام حذف کر دیا گیا' });
+    } catch (error) {
+        console.error("Error deleting message:", error);
+        toast({ variant: 'destructive', title: 'خرابی', description: 'پیغام حذف نہیں کیا جا سکا' });
+    }
+  };
+
+  const handleTranslateMessage = async (messageId: string, textToTranslate: string) => {
+    setTranslatingId(messageId);
+    try {
+        const result = await translateText({ text: textToTranslate, targetLanguage: 'English' });
+        setTranslations(prev => ({...prev, [messageId]: result.translatedText}));
+    } catch (error) {
+        console.error("Error translating message:", error);
+        toast({ variant: 'destructive', title: 'ترجمہ میں خرابی', description: 'پیغام کا ترجمہ نہیں کیا جا سکا۔' });
+    } finally {
+        setTranslatingId(null);
+    }
+  };
+
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       <ScrollArea className="flex-1" ref={scrollAreaRef}>
@@ -83,7 +116,14 @@ export default function ChatView({ chatId }: { chatId: string }) {
           ) : messages.length === 0 ? (
             <p className="text-center text-muted-foreground">ابھی تک کوئی پیغام نہیں۔ گفتگو شروع کریں!</p>
           ) : messages.map((message) => (
-            <MessageBubble key={message.id} message={message} />
+            <MessageBubble 
+                key={message.id} 
+                message={message}
+                onDelete={handleDeleteMessage}
+                onTranslate={handleTranslateMessage}
+                translation={translations[message.id]}
+                isTranslating={translatingId === message.id}
+            />
           ))}
         </div>
       </ScrollArea>
