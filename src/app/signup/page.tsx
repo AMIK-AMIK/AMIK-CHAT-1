@@ -79,7 +79,7 @@ export default function SignupPage() {
         </div>
         <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">اکاؤنٹ بنائیں</CardTitle>
+          <CardTitle className="text-2xl">کھاتہ بنائیں</CardTitle>
           <CardDescription>شروع کرنے کے لیے اپنی معلومات درج کریں</CardDescription>
         </CardHeader>
         <CardContent>
@@ -98,11 +98,11 @@ export default function SignupPage() {
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
               {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-              سائن اپ کریں
+              کھاتہ بنائیں
             </Button>
           </form>
           <div className="mt-4 text-center text-sm">
-            پہلے سے اکاؤنٹ ہے؟{" "}
+            پہلے سے کھاتہ ہے؟{" "}
             <Link href="/login" className="underline text-accent">
               داخل ہوں
             </Link>

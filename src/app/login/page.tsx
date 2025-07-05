@@ -51,8 +51,8 @@ export default function LoginPage() {
         </div>
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl">داخلہ</CardTitle>
-            <CardDescription>اپنے اکاؤنٹ تک رسائی کے لیے اپنی اسناد درج کریں</CardDescription>
+            <CardTitle className="text-2xl">کھاتہ</CardTitle>
+            <CardDescription>اپنے کھاتے تک رسائی کے لیے اپنی اسناد درج کریں</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleLogin} className="space-y-4">
@@ -70,9 +70,9 @@ export default function LoginPage() {
               </Button>
             </form>
             <div className="mt-4 text-center text-sm">
-              اکاؤنٹ نہیں ہے؟{" "}
+              کھاتہ نہیں ہے؟{" "}
               <Link href="/signup" className="underline text-accent">
-                سائن اپ کریں
+                کھاتہ بنائیں
               </Link>
             </div>
           </CardContent>
