@@ -23,18 +23,31 @@ function formatUrduDistanceToNow(date: Date): string {
     if (seconds < 60) return `${seconds} سیکنڈ پہلے`;
     
     const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return `${minutes} منٹ پہلے`;
+    if (minutes < 60) {
+        if (minutes === 1) return `ایک منٹ پہلے`;
+        return `${minutes} منٹ پہلے`;
+    }
     
     const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours} گھنٹے پہلے`;
+    if (hours < 24) {
+        if (hours === 1) return `ایک گھنٹہ پہلے`;
+        return `${hours} گھنٹے پہلے`;
+    }
     
     const days = Math.floor(hours / 24);
-    if (days < 30) return `${days} دن پہلے`;
+    if (days < 30) {
+        if (days === 1) return `ایک دن پہلے`;
+        return `${days} دن پہلے`;
+    }
 
     const months = Math.floor(days / 30);
-    if (months < 12) return `${months} مہینے پہلے`;
+    if (months < 12) {
+        if (months === 1) return `ایک مہینہ پہلے`;
+        return `${months} مہینے پہلے`;
+    }
 
     const years = Math.floor(days / 365);
+    if (years === 1) return `ایک سال پہلے`;
     return `${years} سال پہلے`;
 }
 
@@ -154,19 +167,19 @@ export default function ChatsPage() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onSelect={() => router.push('/chats/new')}>
-                <MessageCircle className="mr-2 h-4 w-4" />
+                <MessageCircle className="h-4 w-4 mr-2" />
                 <span>نئی چیٹ</span>
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => router.push('/contacts/add')}>
-                <UserPlus className="mr-2 h-4 w-4" />
+                <UserPlus className="h-4 w-4 mr-2" />
                 <span>رابطے شامل کریں</span>
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => router.push('/scan')}>
-                <ScanLine className="mr-2 h-4 w-4" />
+                <ScanLine className="h-4 w-4 mr-2" />
                 <span>اسکین</span>
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => router.push('/money')}>
-                <Landmark className="mr-2 h-4 w-4" />
+                <Landmark className="h-4 w-4 mr-2" />
                 <span>پیسے</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
