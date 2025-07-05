@@ -5,11 +5,12 @@ import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ChevronRight, LogOut, Settings, UserCircle, QrCode, Plus } from "lucide-react";
+import { ChevronRight, LogOut, Settings, UserCircle, QrCode, Plus, MessageCircle, UserPlus, ScanLine, Landmark } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/useAuth";
 import { auth } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 
 export default function MePage() {
@@ -29,10 +30,34 @@ export default function MePage() {
     <div>
       <header className="sticky top-0 z-10 flex items-center justify-between border-b bg-background p-4">
         <h1 className="text-xl font-bold">میں</h1>
-         <Button variant="ghost" size="icon" className="h-8 w-8">
-            <Plus className="h-5 w-5" />
-            <span className="sr-only">شامل کریں</span>
-          </Button>
+        <div className="flex items-center gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <Plus className="h-5 w-5" />
+                <span className="sr-only">نئی چیٹ</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onSelect={() => router.push('/contacts')}>
+                <MessageCircle className="h-4 w-4" />
+                <span>نئی چیٹ</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => router.push('/contacts/add')}>
+                <UserPlus className="h-4 w-4" />
+                <span>رابطے شامل کریں</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => router.push('/scan')}>
+                <ScanLine className="h-4 w-4" />
+                <span>اسکین</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => router.push('/money')}>
+                <Landmark className="h-4 w-4" />
+                <span>پیسے</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </header>
 
       <div className="p-4 space-y-6">

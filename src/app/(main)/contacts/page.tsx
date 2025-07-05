@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Users, UserPlus, Loader2 } from "lucide-react";
+import { Users, UserPlus, Loader2, Plus, MessageCircle, ScanLine, Landmark } from "lucide-react";
 import ContactSuggestions from "@/components/contacts/ContactSuggestions";
 import { Button } from "@/components/ui/button";
 import { collection, doc, getDoc, onSnapshot } from 'firebase/firestore';
@@ -14,6 +14,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from "@/hooks/use-toast";
 import { createOrNavigateToChat } from '@/lib/chatUtils';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 function ContactItem({ contact, onClick, isCreatingChat }: { contact: User; onClick: () => void; isCreatingChat: boolean; }) {
   return (
@@ -97,12 +98,34 @@ export default function ContactsPage() {
     <div>
       <header className="sticky top-0 z-10 flex items-center justify-between border-b bg-background p-4">
         <h1 className="text-xl font-bold">رابطے</h1>
-        <Link href="/contacts/add">
-           <Button variant="ghost" size="icon" className="h-8 w-8">
-              <UserPlus className="h-5 w-5" />
-              <span className="sr-only">رابطہ شامل کریں</span>
-            </Button>
-        </Link>
+        <div className="flex items-center gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <Plus className="h-5 w-5" />
+                <span className="sr-only">نئی چیٹ</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onSelect={() => router.push('/contacts')}>
+                <MessageCircle className="h-4 w-4" />
+                <span>نئی چیٹ</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => router.push('/contacts/add')}>
+                <UserPlus className="h-4 w-4" />
+                <span>رابطے شامل کریں</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => router.push('/scan')}>
+                <ScanLine className="h-4 w-4" />
+                <span>اسکین</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => router.push('/money')}>
+                <Landmark className="h-4 w-4" />
+                <span>پیسے</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </header>
 
       <div className="p-4">
