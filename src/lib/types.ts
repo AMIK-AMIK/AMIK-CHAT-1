@@ -7,12 +7,14 @@ export type User = {
 };
 
 export type Message = {
-  id: string;
+  id:string;
   text: string;
   timestamp: Timestamp;
   senderId: string;
   isRead: boolean;
   isDeleted?: boolean;
+  reactions?: Record<string, string[]>; // emoji -> user IDs
+  isForwarded?: boolean;
 };
 
 export type Chat = {

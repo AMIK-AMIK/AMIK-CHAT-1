@@ -11,20 +11,24 @@ import { SendHorizonal } from "lucide-react";
 import MessageBubble from "./MessageBubble";
 import { Label } from "@/components/ui/label";
 import { db } from "@/lib/firebase";
-import { collection, serverTimestamp, query, orderBy, onSnapshot, writeBatch, doc, updateDoc } from "firebase/firestore";
+import { collection, serverTimestamp, query, orderBy, onSnapshot, writeBatch, doc, updateDoc, getDoc } from "firebase/firestore";
 import { translateText } from "@/ai/flows/translate-text";
 import { useToast } from "@/hooks/use-toast";
+import ForwardMessageDialog from "./ForwardMessageDialog";
+import { createOrNavigateToChat } from "@/lib/chatUtils";
+import type { User } from '@/lib/types';
 
 export default function ChatView({ chatId }: { chatId: string }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
-  const { user: currentUser } = useAuth();
+  const { user: currentUser, userData } = useAuth();
   const { toast } = useToast();
 
   const [translations, setTranslations] = useState<Record<string, string>>({});
   const [translatingId, setTranslatingId] = useState<string | null>(null);
+  const [messageToForward, setMessageToForward] = useState<Message | null>(null);
 
   useEffect(() => {
     const q = query(collection(db, `chats/${chatId}/messages`), orderBy("timestamp", "asc"));
@@ -91,6 +95,7 @@ export default function ChatView({ chatId }: { chatId: string }) {
         await updateDoc(messageRef, {
             text: 'یہ پیغام حذف کر دیا گیا',
             isDeleted: true,
+            reactions: {},
         });
         toast({ title: 'پیغام حذف کر دیا گیا' });
     } catch (error) {
@@ -111,6 +116,104 @@ export default function ChatView({ chatId }: { chatId: string }) {
         setTranslatingId(null);
     }
   };
+
+  const handleReactToMessage = async (messageId: string, emoji: string) => {
+    if (!currentUser) return;
+    
+    const messageRef = doc(db, 'chats', chatId, 'messages', messageId);
+    
+    try {
+        const messageDoc = await getDoc(messageRef);
+        if (!messageDoc.exists()) return;
+        
+        const messageData = messageDoc.data() as Message;
+        const reactions = messageData.reactions || {};
+        
+        const uidsWithThisReaction = reactions[emoji] || [];
+
+        // Remove user from any other reaction they might have made
+        Object.keys(reactions).forEach(key => {
+            if (key !== emoji) {
+                reactions[key] = reactions[key]?.filter(uid => uid !== currentUser.uid);
+                if(reactions[key]?.length === 0) {
+                    delete reactions[key];
+                }
+            }
+        });
+        
+        if (uidsWithThisReaction.includes(currentUser.uid)) {
+            // User is removing their reaction
+            reactions[emoji] = uidsWithThisReaction.filter(uid => uid !== currentUser.uid);
+            if (reactions[emoji].length === 0) {
+                delete reactions[emoji];
+            }
+        } else {
+            // User is adding a reaction
+            reactions[emoji] = [...uidsWithThisReaction, currentUser.uid];
+        }
+        
+        await updateDoc(messageRef, { reactions });
+        
+    } catch (error) {
+        console.error("Error reacting to message:", error);
+        toast({ variant: 'destructive', title: 'خرابی', description: 'ردعمل نہیں دے سکے' });
+    }
+  };
+
+  const handleForwardMessage = async (selectedContactIds: string[]) => {
+    if (!messageToForward || !currentUser || !userData) return;
+
+    const toastRef = toast({ description: "فارورڈ کیا جا رہا ہے..." });
+
+    try {
+        const batch = writeBatch(db);
+        
+        const contactDocs = await Promise.all(
+            selectedContactIds.map(id => getDoc(doc(db, 'users', id)))
+        );
+
+        for (const contactDoc of contactDocs) {
+            if (!contactDoc.exists()) continue;
+            const contact = { id: contactDoc.id, ...contactDoc.data() } as User;
+
+            const chatId = await createOrNavigateToChat(currentUser.uid, userData, contact);
+            const chatRef = doc(db, 'chats', chatId);
+            const messagesColRef = collection(chatRef, 'messages');
+            const newMessageRef = doc(messagesColRef);
+
+            const timestamp = serverTimestamp();
+            
+            // Create a clean message object to forward
+            const forwardedMessageData: Partial<Message> = {
+                text: messageToForward.text,
+                senderId: currentUser.uid,
+                timestamp: timestamp,
+                isRead: false,
+                isForwarded: true,
+            };
+
+            batch.set(newMessageRef, forwardedMessageData);
+            batch.update(chatRef, {
+                lastMessage: {
+                    text: forwardedMessageData.text,
+                    senderId: currentUser.uid,
+                    timestamp: timestamp,
+                    isRead: false,
+                }
+            });
+        }
+        
+        await batch.commit();
+        toast({ title: "کامیابی", description: `پیغام ${selectedContactIds.length} رابطوں کو فارورڈ کر دیا گیا ہے۔` });
+        setMessageToForward(null); // Close dialog
+
+    } catch (error) {
+        console.error("Error forwarding message:", error);
+        toast({ variant: 'destructive', title: 'خرابی', description: 'پیغام فارورڈ نہیں کیا جا سکا' });
+    } finally {
+        toastRef.dismiss();
+    }
+  }
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -137,13 +240,18 @@ export default function ChatView({ chatId }: { chatId: string }) {
                 onCopy={handleCopy}
                 onTranslate={handleTranslateMessage}
                 onDeleteForEveryone={handleDeleteMessage}
-                onForward={showComingSoonToast}
-                onReact={showComingSoonToast}
+                onForward={() => setMessageToForward(message)}
+                onReact={handleReactToMessage}
                 onDeleteForMe={showComingSoonToast}
             />
           ))}
         </div>
       </ScrollArea>
+      <ForwardMessageDialog
+        message={messageToForward}
+        onClose={() => setMessageToForward(null)}
+        onForward={handleForwardMessage}
+      />
       <div className="border-t bg-background p-4">
         <form onSubmit={handleSendMessage} className="flex items-center gap-2">
           <Label htmlFor="message-input" className="sr-only">

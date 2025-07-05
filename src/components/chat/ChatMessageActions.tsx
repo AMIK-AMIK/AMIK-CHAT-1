@@ -12,8 +12,8 @@ interface ChatMessageActionsProps {
   message: Message;
   onDeleteForEveryone: (messageId: string) => void;
   onTranslate: (messageId: string, text: string) => void;
-  onForward: () => void;
-  onReact: () => void;
+  onForward: (message: Message) => void;
+  onReact: (messageId: string, emoji: string) => void;
   onDeleteForMe: () => void;
   onCopy: (text: string) => void;
 }
@@ -28,7 +28,6 @@ export default function ChatMessageActions({
   onCopy
 }: ChatMessageActionsProps) {
   const { user: currentUser } = useAuth();
-  const [popoverOpen, setPopoverOpen] = React.useState(false);
 
   if (!message) return null;
 
@@ -36,62 +35,60 @@ export default function ChatMessageActions({
 
   const reactions = ["👍", "❤️", "😂", "😯", "😢", "🙏"];
 
+  const handleActionClick = (action: () => void) => {
+    action();
+    // The popover should close automatically after an action if it's a stateless trigger.
+    // We can manage state if needed, but this is simpler for now.
+    document.body.click(); // Hacky way to close popover
+  };
+
   const actions = [
-    {
-      label: "ردعمل دیں",
-      icon: SmilePlus,
-      onClick: onReact,
-      show: !message.isDeleted,
-    },
     {
       label: "کاپی کریں",
       icon: Copy,
-      onClick: () => onCopy(message.text),
+      onClick: () => handleActionClick(() => onCopy(message.text)),
       show: !message.isDeleted,
     },
     {
       label: "فارورڈ کریں",
       icon: Forward,
-      onClick: onForward,
+      onClick: () => handleActionClick(() => onForward(message)),
       show: !message.isDeleted,
     },
     {
       label: "ترجمہ کریں",
       icon: Languages,
-      onClick: () => onTranslate(message.id, message.text),
+      onClick: () => handleActionClick(() => onTranslate(message.id, message.text)),
       show: !message.isDeleted,
     },
     {
       label: "میرے لیے حذف کریں",
       icon: Trash,
-      onClick: onDeleteForMe,
+      onClick: () => handleActionClick(onDeleteForMe),
       show: true,
       className: "text-destructive hover:text-destructive focus:text-destructive"
     },
     {
       label: "سب کے لیے حذف کریں",
       icon: Trash2,
-      onClick: () => onDeleteForEveryone(message.id),
-      show: isSentByMe,
+      onClick: () => handleActionClick(() => onDeleteForEveryone(message.id)),
+      show: isSentByMe && !message.isDeleted,
       className: "text-destructive hover:text-destructive focus:text-destructive"
     }
   ];
 
-  const handleActionClick = (action: () => void) => {
-    action();
-    // find a way to close the popover
-  };
-
   return (
-    <PopoverContent className="w-60 p-1" side={isSentByMe ? "left" : "right"} align="center">
-        <div className="flex items-center justify-between p-1 mb-1 border-b">
-            {reactions.map((r, i) => (
-                <Button key={i} variant="ghost" size="icon" className="h-8 w-8 text-xl" onClick={onReact}>{r}</Button>
-            ))}
-             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onReact}>
-                <Plus className="h-5 w-5" />
-            </Button>
-        </div>
+    <PopoverContent className="w-auto p-1" side={isSentByMe ? "left" : "right"} align="center">
+        {!message.isDeleted && (
+            <div className="flex items-center justify-between p-1 mb-1 border-b">
+                {reactions.map((r, i) => (
+                    <Button key={i} variant="ghost" size="icon" className="h-8 w-8 text-xl" onClick={() => handleActionClick(() => onReact(message.id, r))}>{r}</Button>
+                ))}
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleActionClick(() => alert('More reactions coming soon!'))}>
+                    <Plus className="h-5 w-5" />
+                </Button>
+            </div>
+        )}
         <div className="flex flex-col gap-0.5">
             {actions.map((action, index) => (
                 action.show && (
@@ -99,7 +96,7 @@ export default function ChatMessageActions({
                         key={index}
                         variant="ghost"
                         className={`justify-start px-2 py-1.5 h-auto text-base ${action.className || ''}`}
-                        onClick={() => handleActionClick(action.onClick)}
+                        onClick={action.onClick}
                     >
                         <action.icon className="mr-3 h-5 w-5" />
                         <span>{action.label}</span>
