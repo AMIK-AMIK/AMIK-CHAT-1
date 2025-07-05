@@ -79,7 +79,7 @@ export default function MePage() {
         
         <Button variant="destructive" className="w-full" onClick={handleLogout}>
           <LogOut className="h-4 w-4" />
-          لاگ آؤٹ
+          کھاتہ خروج
         </Button>
       </div>
     </div>
