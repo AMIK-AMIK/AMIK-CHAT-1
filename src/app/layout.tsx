@@ -14,7 +14,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ur" dir="rtl" suppressHydrationWarning={true}>
+    <html lang="ur" dir="ltr" suppressHydrationWarning={true}>
       <body className="font-body antialiased" suppressHydrationWarning={true}>
         <AuthProvider>
           {children}
