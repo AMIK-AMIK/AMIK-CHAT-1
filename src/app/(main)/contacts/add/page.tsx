@@ -31,8 +31,8 @@ export default function AddContactPage() {
       if (trimmedId === currentUser.uid) {
         toast({
           variant: 'destructive',
-          title: 'Error',
-          description: "You cannot add yourself as a contact.",
+          title: 'خرابی',
+          description: "آپ خود کو بطور رابطہ شامل نہیں کر سکتے۔",
         });
         setLoading(false);
         return;
@@ -44,8 +44,8 @@ export default function AddContactPage() {
       if (!userDoc.exists()) {
         toast({
           variant: 'destructive',
-          title: 'User Not Found',
-          description: 'No user exists with that ID. Please check and try again.',
+          title: 'صارف نہیں ملا',
+          description: 'اس ID کے ساتھ کوئی صارف موجود نہیں ہے۔ براہ کرم چیک کریں اور دوبارہ کوشش کریں۔',
         });
         setLoading(false);
         return;
@@ -58,8 +58,8 @@ export default function AddContactPage() {
 
       if (existingContactSnap.exists()) {
           toast({
-              title: 'Already a Contact',
-              description: `${contactData.name} is already in your contacts.`,
+              title: 'پہلے سے رابطہ ہے',
+              description: `${contactData.name} پہلے ہی آپ کے رابطوں میں ہے۔`,
           });
           setContactId('');
           setLoading(false);
@@ -70,8 +70,8 @@ export default function AddContactPage() {
       await setDoc(newContactRef, { addedAt: serverTimestamp() });
 
       toast({
-        title: 'Success!',
-        description: `${contactData.name} has been added to your contacts.`,
+        title: 'کامیابی!',
+        description: `${contactData.name} آپ کے رابطوں میں شامل کر دیا گیا ہے۔`,
       });
       router.push('/contacts');
 
@@ -79,8 +79,8 @@ export default function AddContactPage() {
       console.error("Error adding contact:", error);
       toast({
         variant: 'destructive',
-        title: 'Error Adding Contact',
-        description: error.message || 'Something went wrong. Please try again.',
+        title: 'رابطہ شامل کرنے میں خرابی',
+        description: error.message || 'کچھ غلط ہو گیا۔ براہ کرم دوبارہ کوشش کریں۔',
       });
     } finally {
       setLoading(false);
@@ -93,14 +93,14 @@ export default function AddContactPage() {
         <Link href="/contacts" className="p-1 rounded-md hover:bg-muted">
           <ChevronLeft className="h-6 w-6" />
         </Link>
-        <h1 className="flex-1 truncate text-lg font-semibold">Add Contact</h1>
+        <h1 className="flex-1 truncate text-lg font-semibold">رابطہ شامل کریں</h1>
       </header>
       <div className="p-4">
         <Card>
           <CardHeader>
-            <CardTitle>Add a New Contact</CardTitle>
+            <CardTitle>نیا رابطہ شامل کریں</CardTitle>
             <CardDescription>
-              Enter the unique AMIK CHAT ID of the user you want to add.
+              جس صارف کو آپ شامل کرنا چاہتے ہیں اس کی منفرد AMIK CHAT ID درج کریں۔
             </CardDescription>
           </CardHeader>
           <form onSubmit={handleAddContact}>
@@ -118,8 +118,8 @@ export default function AddContactPage() {
             </CardContent>
             <CardFooter>
               <Button type="submit" disabled={loading || !currentUser} className="w-full">
-                {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                Add Contact
+                {loading ? <Loader2 className="ml-2 h-4 w-4 animate-spin" /> : null}
+                رابطہ شامل کریں
               </Button>
             </CardFooter>
           </form>

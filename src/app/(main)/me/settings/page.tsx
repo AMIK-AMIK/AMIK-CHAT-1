@@ -16,7 +16,7 @@ export default function SettingsPage() {
         <Button variant="ghost" size="icon" onClick={() => router.back()}>
           <ChevronLeft className="h-6 w-6" />
         </Button>
-        <h1 className="flex-1 truncate text-lg font-semibold">Settings</h1>
+        <h1 className="flex-1 truncate text-lg font-semibold">ترتیبات</h1>
       </header>
 
       <div className="p-4 space-y-4">
@@ -24,10 +24,10 @@ export default function SettingsPage() {
           <CardContent className="p-0">
             <div className="divide-y">
                <Link href="/me/settings/account" className="flex items-center p-4 transition-colors hover:bg-muted/50">
-                <Shield className="mr-4 h-6 w-6 text-accent" />
+                <Shield className="ml-4 h-6 w-6 text-accent" />
                 <div className="flex-1">
-                  <p className="font-medium">Account & Security</p>
-                  <p className="text-sm text-muted-foreground">Password, account details</p>
+                  <p className="font-medium">اکاؤنٹ اور سیکیورٹی</p>
+                  <p className="text-sm text-muted-foreground">پاس ورڈ، اکاؤنٹ کی تفصیلات</p>
                 </div>
                 <ChevronRight className="h-5 w-5 text-muted-foreground" />
               </Link>

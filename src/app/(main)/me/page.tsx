@@ -28,10 +28,10 @@ export default function MePage() {
   return (
     <div>
       <header className="sticky top-0 z-10 flex items-center justify-between border-b bg-background p-4">
-        <h1 className="text-xl font-bold">Me</h1>
+        <h1 className="text-xl font-bold">میں</h1>
          <Button variant="ghost" size="icon" className="h-8 w-8">
             <Plus className="h-5 w-5" />
-            <span className="sr-only">Add</span>
+            <span className="sr-only">شامل کریں</span>
           </Button>
       </header>
 
@@ -44,7 +44,7 @@ export default function MePage() {
             </Avatar>
             <div className="flex-1">
               <p className="text-xl font-semibold">{userData.name}</p>
-              <p className="text-muted-foreground break-all">AMIK CHAT ID: {user.uid}</p>
+              <p className="text-muted-foreground break-all">{user.uid} :AMIK CHAT ID</p>
             </div>
             <Link href="/qr" className="p-2 rounded-md hover:bg-muted">
               <QrCode className="h-6 w-6 text-muted-foreground" />
@@ -64,13 +64,13 @@ export default function MePage() {
           <CardContent className="p-0">
             <div className="divide-y">
               <Link href="/me/edit" className="flex items-center p-4 transition-colors hover:bg-muted/50">
-                <UserCircle className="mr-4 h-6 w-6 text-accent" />
-                <span className="flex-1 font-medium">Edit Profile</span>
+                <UserCircle className="ml-4 h-6 w-6 text-accent" />
+                <span className="flex-1 font-medium">پروفائل میں ترمیم کریں</span>
                 <ChevronRight className="h-5 w-5 text-muted-foreground" />
               </Link>
               <Link href="/me/settings" className="flex items-center p-4 transition-colors hover:bg-muted/50">
-                <Settings className="mr-4 h-6 w-6 text-accent" />
-                <span className="flex-1 font-medium">Settings</span>
+                <Settings className="ml-4 h-6 w-6 text-accent" />
+                <span className="flex-1 font-medium">ترتیبات</span>
                 <ChevronRight className="h-5 w-5 text-muted-foreground" />
               </Link>
             </div>
@@ -78,8 +78,8 @@ export default function MePage() {
         </Card>
         
         <Button variant="destructive" className="w-full" onClick={handleLogout}>
-          <LogOut className="mr-2 h-4 w-4" />
-          Log Out
+          <LogOut className="ml-2 h-4 w-4" />
+          لاگ آؤٹ
         </Button>
       </div>
     </div>

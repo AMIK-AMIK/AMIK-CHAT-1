@@ -12,8 +12,34 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Search, Plus, MessageCircle, UserPlus, ScanLine, Landmark } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+import { format, formatDistanceToNowStrict } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
+
+function formatUrduDistanceToNow(date: Date): string {
+    const now = new Date();
+    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    if (seconds < 60) {
+        return "ابھی ابھی";
+    }
+
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) {
+        return `${minutes} منٹ پہلے`;
+    }
+
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) {
+        return `${hours} گھنٹے پہلے`;
+    }
+
+    const days = Math.floor(hours / 24);
+    if (days < 30) {
+        return `${days} دن پہلے`;
+    }
+    
+    return format(date, "dd/MM/yyyy");
+}
 
 function ChatItem({ chat, currentUserId }: { chat: Chat; currentUserId: string }) {
   const otherParticipantId = chat.participantIds.find(id => id !== currentUserId);
@@ -33,9 +59,9 @@ function ChatItem({ chat, currentUserId }: { chat: Chat; currentUserId: string }
       if (chat.lastMessage?.timestamp) {
         try {
           const date = chat.lastMessage.timestamp.toDate();
-          setTime(formatDistanceToNow(date, { addSuffix: true }));
+          setTime(formatUrduDistanceToNow(date));
         } catch (e) {
-          setTime('just now');
+          setTime('ابھی ابھی');
         }
       } else {
         setTime('');
@@ -61,7 +87,7 @@ function ChatItem({ chat, currentUserId }: { chat: Chat; currentUserId: string }
             <p className="font-semibold truncate text-base">{otherParticipant.name}</p>
             {hasMounted && chat.lastMessage && <p className="text-xs text-muted-foreground">{time}</p>}
           </div>
-          <p className="text-sm text-muted-foreground truncate">{chat.lastMessage?.text || 'No messages yet'}</p>
+          <p className="text-sm text-muted-foreground truncate">{chat.lastMessage?.text || 'ابھی تک کوئی پیغام نہیں'}</p>
         </div>
       </div>
     </Link>
@@ -79,8 +105,6 @@ export default function ChatsPage() {
   useEffect(() => {
     if (!currentUser) return;
     
-    // Fetch chats without ordering to avoid needing a composite index.
-    // We will sort the chats on the client-side.
     const q = query(
       collection(db, 'chats'),
       where('participantIds', 'array-contains', currentUser.uid)
@@ -93,7 +117,6 @@ export default function ChatsPage() {
           ...doc.data()
       })) as Chat[];
       
-      // Sort chats by the most recent message timestamp.
       chatsData.sort((a, b) => {
         const timeA = a.lastMessage?.timestamp?.toDate()?.getTime() || a.createdAt?.toDate()?.getTime() || 0;
         const timeB = b.lastMessage?.timestamp?.toDate()?.getTime() || b.createdAt?.toDate()?.getTime() || 0;
@@ -105,7 +128,7 @@ export default function ChatsPage() {
     }, (error) => {
         console.error("Error fetching chats: ", error);
         setLoading(false);
-        toast({ variant: "destructive", title: "Error", description: "Could not fetch chats. Please check your connection or try again later." });
+        toast({ variant: "destructive", title: "خرابی", description: "چیٹس حاصل نہیں کی جا سکیں۔ براہ کرم اپنا کنکشن چیک کریں یا بعد میں دوبارہ کوشش کریں۔" });
     });
 
     return () => unsubscribe();
@@ -129,25 +152,25 @@ export default function ChatsPage() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="h-8 w-8">
                 <Plus className="h-5 w-5" />
-                <span className="sr-only">New Chat</span>
+                <span className="sr-only">نئی چیٹ</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onSelect={() => router.push('/contacts')}>
-                <MessageCircle className="mr-2 h-4 w-4" />
-                <span>New Chat</span>
+                <MessageCircle className="ml-2 h-4 w-4" />
+                <span>نئی چیٹ</span>
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => router.push('/contacts/add')}>
-                <UserPlus className="mr-2 h-4 w-4" />
-                <span>Add Contacts</span>
+                <UserPlus className="ml-2 h-4 w-4" />
+                <span>رابطے شامل کریں</span>
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => router.push('/scan')}>
-                <ScanLine className="mr-2 h-4 w-4" />
-                <span>Scan</span>
+                <ScanLine className="ml-2 h-4 w-4" />
+                <span>اسکین</span>
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => router.push('/money')}>
-                <Landmark className="mr-2 h-4 w-4" />
-                <span>Money</span>
+                <Landmark className="ml-2 h-4 w-4" />
+                <span>پیسے</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -155,10 +178,10 @@ export default function ChatsPage() {
       </header>
        <div className="p-4 border-b">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+          <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input 
-            placeholder="Search" 
-            className="pl-10"
+            placeholder="تلاش کریں" 
+            className="pr-10"
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
           />
@@ -166,13 +189,13 @@ export default function ChatsPage() {
       </div>
       <div className="divide-y">
         {loading ? (
-          <p className="p-4 text-center text-muted-foreground">Loading chats...</p>
+          <p className="p-4 text-center text-muted-foreground">چیٹس لوڈ ہو رہی ہیں...</p>
         ) : filteredChats.length > 0 ? (
           filteredChats.map(chat => (
             currentUser && <ChatItem key={chat.id} chat={chat} currentUserId={currentUser.uid} />
           ))
         ) : (
-           <p className="p-4 text-center text-muted-foreground">No chats found.</p>
+           <p className="p-4 text-center text-muted-foreground">کوئی چیٹ نہیں ملی۔</p>
         )}
       </div>
     </div>

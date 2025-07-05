@@ -1,7 +1,7 @@
 "use client";
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, use } from 'react';
 import { ChevronLeft, MoreHorizontal } from 'lucide-react';
 import ChatView from '@/components/chat/ChatView';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -11,7 +11,8 @@ import { db } from '@/lib/firebase';
 import type { User } from '@/lib/types';
 import { useAuth } from '@/hooks/useAuth';
 
-export default function ChatPage({ params: { id } }: { params: { id: string } }) {
+export default function ChatPage({ params }: { params: { id: string } }) {
+  const { id } = params;
   const [otherParticipant, setOtherParticipant] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const { user: currentUser } = useAuth();
@@ -107,7 +108,7 @@ export default function ChatPage({ params: { id } }: { params: { id: string } })
   if (loading) {
     return (
       <div className="flex h-full flex-col items-center justify-center">
-        <p>Loading chat...</p>
+        <p>چیٹ لوڈ ہو رہی ہے...</p>
       </div>
     );
   }

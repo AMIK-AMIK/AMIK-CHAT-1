@@ -17,8 +17,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ChevronLeft, Loader2, RefreshCw } from "lucide-react";
 
 const profileFormSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters." }).max(50),
-  avatarUrl: z.string().url({ message: "Please enter a valid URL." }).optional().or(z.literal('')),
+  name: z.string().min(2, { message: "نام کم از کم 2 حروف کا ہونا چاہیے۔" }).max(50),
+  avatarUrl: z.string().url({ message: "براہ کرم ایک درست یو آر ایل درج کریں۔" }).optional().or(z.literal('')),
 });
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
@@ -54,20 +54,19 @@ export default function EditProfilePage() {
     try {
       await updateProfile({ 
         name: data.name,
-        // If avatarUrl is empty or not a valid URL (e.g., after clearing), generate a placeholder.
         avatarUrl: data.avatarUrl || `https://placehold.co/100x100.png?text=${data.name.charAt(0).toUpperCase()}`
       });
       toast({
-        title: "Profile Updated",
-        description: "Your profile has been successfully updated.",
+        title: "پروفائل اپ ڈیٹ ہو گئی",
+        description: "آپ کی پروفائل کامیابی سے اپ ڈیٹ ہو گئی ہے۔",
       });
       router.push("/me");
     } catch (error) {
       console.error("Error updating profile:", error);
       toast({
         variant: "destructive",
-        title: "Update Failed",
-        description: "Something went wrong while updating your profile.",
+        title: "اپ ڈیٹ ناکام",
+        description: "آپ کی پروفائل کو اپ ڈیٹ کرتے وقت کچھ غلط ہو گیا۔",
       });
     } finally {
       setIsSubmitting(false);
@@ -76,7 +75,6 @@ export default function EditProfilePage() {
   
   const generateNewAvatar = () => {
     const currentName = form.getValues("name") || 'A';
-    // Add a timestamp to ensure the URL is unique and bypasses browser cache
     const newAvatar = `https://placehold.co/100x100.png?text=${currentName.charAt(0).toUpperCase()}&c=${Date.now()}`;
     form.setValue('avatarUrl', newAvatar, { shouldDirty: true });
   }
@@ -86,7 +84,7 @@ export default function EditProfilePage() {
       <div className="p-4">
         <Card>
           <CardHeader>
-            <CardTitle>Loading...</CardTitle>
+            <CardTitle>لوڈ ہو رہا ہے...</CardTitle>
           </CardHeader>
         </Card>
       </div>
@@ -99,14 +97,14 @@ export default function EditProfilePage() {
         <Link href="/me" className="p-1 rounded-md hover:bg-muted">
           <ChevronLeft className="h-6 w-6" />
         </Link>
-        <h1 className="flex-1 truncate text-lg font-semibold">Edit Profile</h1>
+        <h1 className="flex-1 truncate text-lg font-semibold">پروفائل میں ترمیم کریں</h1>
       </header>
 
       <div className="p-4">
         <Card>
           <CardHeader>
-            <CardTitle>Your Information</CardTitle>
-            <CardDescription>Update your username and profile photo.</CardDescription>
+            <CardTitle>آپ کی معلومات</CardTitle>
+            <CardDescription>اپنا صارف نام اور پروفائل تصویر اپ ڈیٹ کریں۔</CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
@@ -119,8 +117,8 @@ export default function EditProfilePage() {
                       </AvatarFallback>
                     </Avatar>
                   <Button type="button" variant="outline" onClick={generateNewAvatar}>
-                    <RefreshCw className="mr-2 h-4 w-4" />
-                    Generate New Avatar
+                    <RefreshCw className="ml-2 h-4 w-4" />
+                    نیا اوتار بنائیں
                   </Button>
                 </div>
 
@@ -129,9 +127,9 @@ export default function EditProfilePage() {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Username</FormLabel>
+                      <FormLabel>صارف نام</FormLabel>
                       <FormControl>
-                        <Input placeholder="Your name" {...field} />
+                        <Input placeholder="آپ کا نام" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -139,8 +137,8 @@ export default function EditProfilePage() {
                 />
                 
                 <Button type="submit" disabled={isSubmitting} className="w-full">
-                  {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                  Save Changes
+                  {isSubmitting ? <Loader2 className="ml-2 h-4 w-4 animate-spin" /> : null}
+                  تبدیلیاں محفوظ کریں
                 </Button>
               </form>
             </Form>

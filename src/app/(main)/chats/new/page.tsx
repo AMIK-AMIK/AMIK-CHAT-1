@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -59,10 +58,10 @@ export default function NewChatPage() {
       console.error("Error creating or finding chat: ", error);
       toast({
         variant: 'destructive',
-        title: 'Error Starting Chat',
+        title: 'چیٹ شروع کرنے میں خرابی',
         description: error.code === 'permission-denied' 
-          ? 'Permission denied. Please check your Firestore security rules.' 
-          : error.message || 'An unknown error occurred.',
+          ? 'اجازت مسترد کر دی گئی۔ براہ کرم اپنے Firestore سیکیورٹی قوانین کو چیک کریں۔' 
+          : error.message || 'ایک نامعلوم خرابی پیش آگئی۔',
       });
     } finally {
         setCreatingChat(null);
@@ -75,10 +74,10 @@ export default function NewChatPage() {
         <Link href="/chats" className="p-1 rounded-md hover:bg-muted">
           <ChevronLeft className="h-6 w-6" />
         </Link>
-        <h1 className="flex-1 truncate text-lg font-semibold">New Chat</h1>
+        <h1 className="flex-1 truncate text-lg font-semibold">نئی چیٹ</h1>
       </header>
       <div className="divide-y">
-        <h2 className="p-4 text-sm font-semibold text-muted-foreground">Choose a contact</h2>
+        <h2 className="p-4 text-sm font-semibold text-muted-foreground">ایک رابطہ منتخب کریں</h2>
         {loading ? (
            <div className="p-4 space-y-4">
             <div className="flex items-center gap-4">
@@ -106,7 +105,7 @@ export default function NewChatPage() {
             </div>
           ))
         ) : (
-          <p className="p-4 text-center text-muted-foreground">You have no contacts to start a chat with. <Link href="/contacts/add" className='text-primary underline'>Add one!</Link></p>
+          <p className="p-4 text-center text-muted-foreground">چیٹ شروع کرنے کے لیے آپ کے پاس کوئی رابطہ نہیں ہے۔ <Link href="/contacts/add" className='text-primary underline'>ایک شامل کریں!</Link></p>
         )}
       </div>
     </div>

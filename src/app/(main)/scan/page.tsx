@@ -36,8 +36,8 @@ export default function ScanPage() {
     if (!code.startsWith('amik-chat-user://')) {
         toast({
             variant: 'destructive',
-            title: 'Invalid QR Code',
-            description: 'This is not a valid AMIK CHAT QR code.',
+            title: 'غلط QR کوڈ',
+            description: 'یہ ایک درست AMIK CHAT QR کوڈ نہیں ہے۔',
         });
         router.back();
         return;
@@ -47,8 +47,8 @@ export default function ScanPage() {
 
     if (contactId === currentUser.uid) {
         toast({
-            title: "That's you!",
-            description: "You can't add yourself as a contact.",
+            title: "یہ آپ ہیں!",
+            description: "آپ خود کو بطور رابطہ شامل نہیں کر سکتے۔",
         });
         router.back();
         return;
@@ -59,7 +59,7 @@ export default function ScanPage() {
         const userDoc = await getDoc(userDocRef);
 
         if (!userDoc.exists()) {
-            toast({ variant: 'destructive', title: 'User Not Found', description: 'This QR code is not linked to a valid user.' });
+            toast({ variant: 'destructive', title: 'صارف نہیں ملا', description: 'یہ QR کوڈ کسی درست صارف سے منسلک نہیں ہے۔' });
             router.back();
             return;
         }
@@ -70,8 +70,8 @@ export default function ScanPage() {
         const existingContactSnap = await getDoc(existingContactRef);
         if (existingContactSnap.exists()) {
             toast({
-                title: 'Already a Contact',
-                description: `${contactData.name} is already in your contacts.`,
+                title: 'پہلے سے رابطہ ہے',
+                description: `${contactData.name} پہلے ہی آپ کے رابطوں میں ہے۔`,
             });
             router.push('/contacts');
             return;
@@ -81,8 +81,8 @@ export default function ScanPage() {
         await setDoc(newContactRef, { addedAt: serverTimestamp() });
 
         toast({
-            title: 'Contact Added!',
-            description: `${contactData.name} has been added to your contacts.`,
+            title: 'رابطہ شامل ہو گیا!',
+            description: `${contactData.name} کو آپ کے رابطوں میں شامل کر دیا گیا ہے۔`,
         });
         router.push('/contacts');
 
@@ -90,8 +90,8 @@ export default function ScanPage() {
         console.error("Error adding contact from QR code:", error);
         toast({
             variant: 'destructive',
-            title: 'Error Adding Contact',
-            description: error.message || 'Something went wrong. Please try again.',
+            title: 'رابطہ شامل کرنے میں خرابی',
+            description: error.message || 'کچھ غلط ہو گیا۔ براہ کرم دوبارہ کوشش کریں۔',
         });
         router.back();
     }
@@ -151,7 +151,7 @@ export default function ScanPage() {
         <Button variant="ghost" size="icon" onClick={() => router.back()} className="hover:bg-zinc-800">
           <ChevronLeft className="h-6 w-6" />
         </Button>
-        <h1 className="flex-1 truncate text-lg font-semibold text-center">Scan</h1>
+        <h1 className="flex-1 truncate text-lg font-semibold text-center">اسکین</h1>
         <div className="w-10"></div>
       </header>
       <main className="flex-1 flex flex-col items-center justify-center p-4 relative">
@@ -161,9 +161,9 @@ export default function ScanPage() {
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 text-white p-4 text-center">
             <VideoOff className="h-16 w-16 mb-4" />
             <Alert variant="destructive" className="bg-transparent border-red-500 text-white">
-                <AlertTitle>Camera Access Denied</AlertTitle>
+                <AlertTitle>کیمرے تک رسائی مسترد</AlertTitle>
                 <AlertDescription>
-                    Please enable camera permissions in your browser settings to scan QR codes.
+                    QR کوڈ اسکین کرنے کے لیے براہ کرم اپنے براؤزر کی ترتیبات میں کیمرے کی اجازت کو فعال کریں۔
                 </AlertDescription>
             </Alert>
           </div>
@@ -172,12 +172,12 @@ export default function ScanPage() {
         {isProcessing && (
           <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center text-white">
             <Loader2 className="h-16 w-16 animate-spin mb-4" />
-            <p>Processing...</p>
+            <p>پروسیسنگ...</p>
           </div>
         )}
         
         {!isProcessing && <p className="mt-4 text-center text-white">
-          {hasCameraPermission === null ? 'Initializing scanner...' : isScanning ? 'Place a QR code inside the frame to scan it.' : 'Waiting for camera...'}
+          {hasCameraPermission === null ? 'اسکینر شروع ہو رہا ہے...' : isScanning ? 'اسکین کرنے کے لیے فریم کے اندر ایک QR کوڈ رکھیں۔' : 'کیمرے کا انتظار ہے...'}
         </p>}
       </main>
     </div>

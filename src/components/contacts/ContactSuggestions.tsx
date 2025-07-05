@@ -19,7 +19,7 @@ function SubmitButton() {
   return (
     <Button type="submit" disabled={pending} className="w-full sm:w-auto">
       {pending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
-      Suggest Contacts
+      رابطے تجویز کریں
     </Button>
   );
 }
@@ -30,34 +30,34 @@ export default function ContactSuggestions() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Smart Contact Suggestions</CardTitle>
+        <CardTitle>اسمارٹ رابطے کی تجاویز</CardTitle>
         <CardDescription>
-          Let AI suggest new contacts based on your profile and communication patterns.
+          AI کو اپنی پروفائل اور مواصلاتی نمونوں کی بنیاد پر نئے رابطے تجویز کرنے دیں۔
         </CardDescription>
       </CardHeader>
       <form action={formAction}>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="profileInformation">Your Profile Information</Label>
+            <Label htmlFor="profileInformation">آپ کی پروفائل کی معلومات</Label>
             <Textarea
               id="profileInformation"
               name="profileInformation"
-              placeholder="e.g., Software engineer at Acme Inc. Interested in AI and web development."
+              placeholder="مثال کے طور پر، Acme Inc. میں سافٹ ویئر انجینئر۔ AI اور ویب ڈویلپمنٹ میں دلچسپی۔"
               required
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="communicationPatterns">Your Communication Patterns</Label>
+            <Label htmlFor="communicationPatterns">آپ کے مواصلاتی نمونے</Label>
             <Textarea
               id="communicationPatterns"
               name="communicationPatterns"
-              placeholder="e.g., Frequently chat with the design team and project managers. Often discuss project deadlines and feature implementations."
+              placeholder="مثال کے طور پر، ڈیزائن ٹیم اور پروجیکٹ مینیجرز کے ساتھ اکثر چیٹ کریں۔ اکثر پروجیکٹ کی آخری تاریخوں اور فیچر کے نفاذ پر تبادلہ خیال کریں۔"
               required
             />
           </div>
         </CardContent>
         <CardFooter className="flex flex-col-reverse sm:flex-row sm:justify-between items-center gap-4">
-           <p className="text-sm text-muted-foreground">Powered by Genkit AI</p>
+           <p className="text-sm text-muted-foreground">Genkit AI سے تقویت یافتہ</p>
           <SubmitButton />
         </CardFooter>
       </form>
@@ -66,9 +66,9 @@ export default function ContactSuggestions() {
          <CardContent>
             <Alert>
               <Wand2 className="h-4 w-4" />
-              <AlertTitle>Here are some suggestions!</AlertTitle>
+              <AlertTitle>یہاں کچھ تجاویز ہیں!</AlertTitle>
               <AlertDescription>
-                <ul className="mt-2 list-disc pl-5 space-y-1">
+                <ul className="mt-2 list-disc pr-5 space-y-1">
                   {state.suggestedContacts.map((contact, index) => (
                     <li key={index}>{contact}</li>
                   ))}

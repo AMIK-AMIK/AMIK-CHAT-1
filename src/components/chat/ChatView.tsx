@@ -75,13 +75,13 @@ export default function ChatView({ chatId }: { chatId: string }) {
   };
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex-1 flex flex-col">
       <ScrollArea className="flex-1" ref={scrollAreaRef}>
         <div className="space-y-4 p-4">
           {loading ? (
-             <p className="text-center text-muted-foreground">Loading messages...</p>
+             <p className="text-center text-muted-foreground">پیغامات لوڈ ہو رہے ہیں...</p>
           ) : messages.length === 0 ? (
-            <p className="text-center text-muted-foreground">No messages yet. Start the conversation!</p>
+            <p className="text-center text-muted-foreground">ابھی تک کوئی پیغام نہیں۔ گفتگو شروع کریں!</p>
           ) : messages.map((message) => (
             <MessageBubble key={message.id} message={message} />
           ))}
@@ -90,20 +90,20 @@ export default function ChatView({ chatId }: { chatId: string }) {
       <div className="border-t bg-background p-4">
         <form onSubmit={handleSendMessage} className="flex items-center gap-2">
           <Label htmlFor="message-input" className="sr-only">
-            Type a message
+            ایک پیغام لکھیں
           </Label>
           <Input
             id="message-input"
             name="message-input"
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Type a message..."
+            placeholder="ایک پیغام لکھیں..."
             autoComplete="off"
             className="text-base"
           />
           <Button type="submit" size="icon" disabled={!newMessage.trim() || !currentUser}>
             <SendHorizonal className="h-5 w-5" />
-            <span className="sr-only">Send</span>
+            <span className="sr-only">بھیجیں</span>
           </Button>
         </form>
       </div>

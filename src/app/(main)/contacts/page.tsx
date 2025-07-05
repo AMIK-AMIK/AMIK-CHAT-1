@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -84,10 +83,10 @@ export default function ContactsPage() {
       console.error("Error creating or finding chat: ", error);
       toast({
         variant: 'destructive',
-        title: 'Error Starting Chat',
+        title: 'چیٹ شروع کرنے میں خرابی',
         description: error.code === 'permission-denied' 
-          ? 'Permission denied. Please check your Firestore security rules.' 
-          : error.message || 'An unknown error occurred.',
+          ? 'اجازت مسترد کر دی گئی۔ براہ کرم اپنے Firestore سیکیورٹی قوانین کو چیک کریں۔' 
+          : error.message || 'ایک نامعلوم خرابی پیش آگئی۔',
       });
     } finally {
       setCreatingChat(null);
@@ -97,11 +96,11 @@ export default function ContactsPage() {
   return (
     <div>
       <header className="sticky top-0 z-10 flex items-center justify-between border-b bg-background p-4">
-        <h1 className="text-xl font-bold">Contacts</h1>
+        <h1 className="text-xl font-bold">رابطے</h1>
         <Link href="/contacts/add">
            <Button variant="ghost" size="icon" className="h-8 w-8">
               <UserPlus className="h-5 w-5" />
-              <span className="sr-only">Add Contact</span>
+              <span className="sr-only">رابطہ شامل کریں</span>
             </Button>
         </Link>
       </header>
@@ -111,7 +110,7 @@ export default function ContactsPage() {
       </div>
 
       <div className="border-t">
-        <h2 className="p-4 text-sm font-semibold text-muted-foreground">My Contacts</h2>
+        <h2 className="p-4 text-sm font-semibold text-muted-foreground">میرے رابطے</h2>
         {loading ? (
           <div className="p-4 space-y-4">
             <div className="flex items-center gap-4">
@@ -137,8 +136,8 @@ export default function ContactsPage() {
         ) : (
           <div className="flex flex-col items-center justify-center p-8 text-center text-muted-foreground">
             <Users className="h-16 w-16 mb-4" />
-            <h3 className="text-lg font-semibold">No Contacts Yet</h3>
-            <p className="text-sm">Use the '+' button to add new contacts.</p>
+            <h3 className="text-lg font-semibold">ابھی تک کوئی رابطہ نہیں</h3>
+            <p className="text-sm">نئے رابطے شامل کرنے کے لیے '+' بٹن کا استعمال کریں۔</p>
           </div>
         )}
       </div>

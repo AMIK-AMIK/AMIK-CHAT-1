@@ -34,8 +34,8 @@ export default function SignupPage() {
     if (password.length < 6) {
         toast({
             variant: "destructive",
-            title: "Password too short",
-            description: "Password should be at least 6 characters.",
+            title: "پاس ورڈ بہت چھوٹا ہے",
+            description: "پاس ورڈ کم از کم 6 حروف کا ہونا چاہیے۔",
         });
         setLoading(false);
         return;
@@ -54,15 +54,15 @@ export default function SignupPage() {
       router.push('/chats');
 
     } catch (error: any) {
-      let description = "An unknown error occurred.";
+      let description = "ایک نامعلوم خرابی پیش آگئی۔";
       if (error.code === 'auth/api-key-not-valid') {
-        description = "Your Firebase API key is not valid. Please check your .env file."
+        description = "آپ کی Firebase API کلید درست نہیں ہے۔ براہ کرم اپنی .env فائل کو چیک کریں۔"
       } else if (error.message) {
         description = error.message;
       }
       toast({
         variant: "destructive",
-        title: "Signup Failed",
+        title: "سائن اپ ناکام",
         description: description,
       });
     } finally {
@@ -79,32 +79,32 @@ export default function SignupPage() {
         </div>
         <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Create an Account</CardTitle>
-          <CardDescription>Enter your information to get started</CardDescription>
+          <CardTitle className="text-2xl">اکاؤنٹ بنائیں</CardTitle>
+          <CardDescription>شروع کرنے کے لیے اپنی معلومات درج کریں</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSignup} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
-              <Input id="username" name="username" type="text" placeholder="Your Name" required />
+              <Label htmlFor="username">صارف نام</Label>
+              <Input id="username" name="username" type="text" placeholder="آپ کا نام" required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">ای میل</Label>
               <Input id="email" name="email" type="email" placeholder="m@example.com" required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">پاس ورڈ</Label>
               <Input id="password" name="password" type="password" required />
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Sign Up
+              {loading && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+              سائن اپ کریں
             </Button>
           </form>
           <div className="mt-4 text-center text-sm">
-            Already have an account?{" "}
+            پہلے سے اکاؤنٹ ہے؟{" "}
             <Link href="/login" className="underline text-accent">
-              Login
+              لاگ ان
             </Link>
           </div>
         </CardContent>

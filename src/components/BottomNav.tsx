@@ -6,10 +6,10 @@ import { Compass, MessageSquare, Users, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { href: "/chats", icon: MessageSquare, label: "Chats" },
-  { href: "/contacts", icon: Users, label: "Contacts" },
-  { href: "/discover", icon: Compass, label: "Discover" },
-  { href: "/me", icon: User, label: "Me" },
+  { href: "/chats", icon: MessageSquare, label: "چیٹس" },
+  { href: "/contacts", icon: Users, label: "رابطے" },
+  { href: "/discover", icon: Compass, label: "دریافت" },
+  { href: "/me", icon: User, label: "میں" },
 ];
 
 export default function BottomNav() {

@@ -15,11 +15,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { ChevronLeft, Loader2 } from "lucide-react";
 
 const passwordFormSchema = z.object({
-  password: z.string().min(6, { message: "Password must be at least 6 characters." }),
+  password: z.string().min(6, { message: "پاس ورڈ کم از کم 6 حروف کا ہونا چاہیے۔" }),
   confirmPassword: z.string(),
 }).refine(data => data.password === data.confirmPassword, {
-  message: "Passwords do not match.",
-  path: ["confirmPassword"], // path of error
+  message: "پاس ورڈز مماثل نہیں ہیں۔",
+  path: ["confirmPassword"],
 });
 
 type PasswordFormValues = z.infer<typeof passwordFormSchema>;
@@ -43,21 +43,21 @@ export default function AccountPage() {
     try {
       await changePassword(data.password);
       toast({
-        title: "Password Updated",
-        description: "Your password has been successfully changed.",
+        title: "پاس ورڈ اپ ڈیٹ ہو گیا",
+        description: "آپ کا پاس ورڈ کامیابی سے تبدیل ہو گیا ہے۔",
       });
       router.back();
     } catch (error: any) {
       console.error("Error updating password:", error);
-      let description = "Something went wrong.";
+      let description = "کچھ غلط ہو گیا۔";
       if (error.code === 'auth/requires-recent-login') {
-        description = "This action is sensitive and requires recent authentication. Please log out and log back in before trying again."
+        description = "یہ کارروائی حساس ہے اور حالیہ تصدیق کی ضرورت ہے۔ براہ کرم دوبارہ کوشش کرنے سے پہلے لاگ آؤٹ کریں اور دوبارہ لاگ ان کریں۔"
       } else {
         description = error.message;
       }
       toast({
         variant: "destructive",
-        title: "Update Failed",
+        title: "اپ ڈیٹ ناکام",
         description: description,
       });
     } finally {
@@ -71,14 +71,14 @@ export default function AccountPage() {
         <Button variant="ghost" size="icon" onClick={() => router.back()}>
             <ChevronLeft className="h-6 w-6" />
         </Button>
-        <h1 className="flex-1 truncate text-lg font-semibold">Account & Security</h1>
+        <h1 className="flex-1 truncate text-lg font-semibold">اکاؤنٹ اور سیکیورٹی</h1>
       </header>
 
       <div className="p-4">
         <Card>
           <CardHeader>
-            <CardTitle>Change Password</CardTitle>
-            <CardDescription>Enter a new password for your account.</CardDescription>
+            <CardTitle>پاس ورڈ تبدیل کریں</CardTitle>
+            <CardDescription>اپنے اکاؤنٹ کے لیے نیا پاس ورڈ درج کریں۔</CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
@@ -88,7 +88,7 @@ export default function AccountPage() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>New Password</FormLabel>
+                      <FormLabel>نیا پاس ورڈ</FormLabel>
                       <FormControl>
                         <Input type="password" placeholder="••••••••" {...field} />
                       </FormControl>
@@ -101,7 +101,7 @@ export default function AccountPage() {
                   name="confirmPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Confirm New Password</FormLabel>
+                      <FormLabel>نئے پاس ورڈ کی تصدیق کریں</FormLabel>
                       <FormControl>
                         <Input type="password" placeholder="••••••••" {...field} />
                       </FormControl>
@@ -111,8 +111,8 @@ export default function AccountPage() {
                 />
                 
                 <Button type="submit" disabled={isSubmitting} className="w-full">
-                  {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                  Update Password
+                  {isSubmitting ? <Loader2 className="ml-2 h-4 w-4 animate-spin" /> : null}
+                  پاس ورڈ اپ ڈیٹ کریں
                 </Button>
               </form>
             </Form>

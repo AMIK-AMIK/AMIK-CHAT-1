@@ -13,12 +13,12 @@ export default function MoneyPage() {
         <Button variant="ghost" size="icon" onClick={() => router.back()}>
           <ChevronLeft className="h-6 w-6" />
         </Button>
-        <h1 className="flex-1 truncate text-lg font-semibold text-center">Money</h1>
+        <h1 className="flex-1 truncate text-lg font-semibold text-center">پیسے</h1>
         <div className="w-10"></div>
       </header>
       <div className="flex flex-col items-center justify-center p-8 text-center text-muted-foreground h-[80vh]">
-        <h3 className="text-lg font-semibold">Money / Payments</h3>
-        <p className="text-sm">This feature is coming soon.</p>
+        <h3 className="text-lg font-semibold">پیسے / ادائیگیاں</h3>
+        <p className="text-sm">یہ فیچر جلد آرہا ہے۔</p>
       </div>
     </div>
   );

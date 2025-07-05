@@ -21,13 +21,13 @@ export default function QrCodePage() {
 
   const handleSaveImage = () => {
     if (!qrCodeRef.current) {
-        toast({ variant: 'destructive', title: 'Error', description: 'Could not save QR code.' });
+        toast({ variant: 'destructive', title: 'خرابی', description: 'QR کوڈ محفوظ نہیں ہو سکا۔' });
         return;
     };
 
     const svgElement = qrCodeRef.current.querySelector('svg');
     if (!svgElement) {
-        toast({ variant: 'destructive', title: 'Error', description: 'Could not find QR code element.' });
+        toast({ variant: 'destructive', title: 'خرابی', description: 'QR کوڈ عنصر نہیں مل سکا۔' });
         return;
     }
     
@@ -35,7 +35,7 @@ export default function QrCodePage() {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
     if (!ctx) {
-        toast({ variant: 'destructive', title: 'Error', description: 'Could not create image.' });
+        toast({ variant: 'destructive', title: 'خرابی', description: 'تصویر نہیں بن سکی۔' });
         return;
     }
     
@@ -51,10 +51,10 @@ export default function QrCodePage() {
       downloadLink.href = pngFile;
       downloadLink.click();
 
-      toast({ title: 'Success', description: 'QR Code saved to downloads.' });
+      toast({ title: 'کامیابی', description: 'QR کوڈ ڈاؤن لوڈ میں محفوظ ہو گیا۔' });
     };
     img.onerror = () => {
-       toast({ variant: 'destructive', title: 'Error', description: 'Could not load QR code for saving.' });
+       toast({ variant: 'destructive', title: 'خرابی', description: 'محفوظ کرنے کے لیے QR کوڈ لوڈ نہیں ہو سکا۔' });
     }
     img.src = `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svgData)))}`;
   };
@@ -80,8 +80,8 @@ export default function QrCodePage() {
                   <AvatarFallback className="text-2xl">{userData.name.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="text-xl font-bold text-left">{userData.name}</p>
-                  <p className="text-muted-foreground text-left">Pakistan</p> {/* Placeholder */}
+                  <p className="text-xl font-bold text-right">{userData.name}</p>
+                  <p className="text-muted-foreground text-right">پاکستان</p>
                 </div>
               </div>
 
@@ -98,7 +98,7 @@ export default function QrCodePage() {
                   </div>
               </div>
 
-              <p className="text-muted-foreground">Scan the QR code to add me as friend</p>
+              <p className="text-muted-foreground">دوست کے طور پر شامل کرنے کے لیے QR کوڈ اسکین کریں</p>
             </>
           ) : (
             <div className="space-y-6 flex flex-col items-center">
@@ -117,11 +117,11 @@ export default function QrCodePage() {
 
         <footer className="w-full max-w-sm pb-4">
           <div className="flex items-center justify-center space-x-2">
-            <Button variant="link" className="text-muted-foreground hover:text-primary px-2" onClick={() => router.push('/scan')}>Scan</Button>
+            <Button variant="link" className="text-muted-foreground hover:text-primary px-2" onClick={() => router.push('/scan')}>اسکین</Button>
             <Separator orientation="vertical" className="h-4" />
-            <Button variant="link" className="text-muted-foreground hover:text-primary px-2">Change Style</Button>
+            <Button variant="link" className="text-muted-foreground hover:text-primary px-2">اسٹائل تبدیل کریں</Button>
             <Separator orientation="vertical" className="h-4" />
-            <Button variant="link" className="text-muted-foreground hover:text-primary px-2" onClick={handleSaveImage}>Save Image</Button>
+            <Button variant="link" className="text-muted-foreground hover:text-primary px-2" onClick={handleSaveImage}>تصویر محفوظ کریں</Button>
           </div>
         </footer>
       </main>

@@ -5,7 +5,7 @@ import { AuthProvider } from '@/hooks/useAuth';
 
 export const metadata: Metadata = {
   title: 'AMIK CHAT',
-  description: 'A modern chat application',
+  description: 'ایک جدید چیٹ ایپلیکیشن',
 };
 
 export default function RootLayout({
@@ -14,7 +14,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning={true}>
+    <html lang="ur" dir="rtl" suppressHydrationWarning={true}>
       <body className="font-body antialiased" suppressHydrationWarning={true}>
         <AuthProvider>
           {children}

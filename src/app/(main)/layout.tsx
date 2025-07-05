@@ -38,7 +38,6 @@ export default function MainAppLayout({
 
     const unsubscribe = onSnapshot(chatsQuery, (snapshot) => {
       snapshot.docChanges().forEach(async (change) => {
-        // We only care about new or updated chats
         if (change.type === 'added' || change.type === 'modified') {
           const chat = change.doc.data() as Chat;
           const chatId = change.doc.id;
@@ -46,16 +45,10 @@ export default function MainAppLayout({
 
           const isViewingChat = pathname === `/chats/${chatId}`;
 
-          // Conditions for showing a notification:
-          // 1. There is a last message.
-          // 2. It was sent by someone else.
-          // 3. It's unread.
-          // 4. The user is NOT currently viewing that specific chat.
           if (lastMessage && lastMessage.senderId !== user.uid && !lastMessage.isRead && !isViewingChat) {
             const messageTimestamp = lastMessage.timestamp?.toMillis() ?? Date.now();
             const messageKey = `${chatId}-${messageTimestamp}`;
 
-            // 5. We haven't already shown a notification for this exact message.
             if (notifiedMessageKeys.current.has(messageKey)) {
               return;
             }
@@ -98,8 +91,8 @@ export default function MainAppLayout({
       if (error.code === 'permission-denied') {
         toast({
           variant: "destructive",
-          title: "Permissions Error",
-          description: "Could not load chat list. Please check your Firestore security rules to allow querying the 'chats' collection.",
+          title: "اجازت کی خرابی",
+          description: "چیٹ کی فہرست لوڈ نہیں ہو سکی۔ براہ کرم 'chats' کلیکشن سے استفسار کی اجازت دینے کے لیے اپنے Firestore سیکیورٹی قوانین کو چیک کریں۔",
           duration: 10000,
         });
       }
