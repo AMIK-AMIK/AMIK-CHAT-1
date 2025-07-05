@@ -35,24 +35,24 @@ export default function MePage() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="h-8 w-8">
                 <Plus className="h-5 w-5" />
-                <span className="sr-only">نئی چیٹ</span>
+                <span className="sr-only">شامل کریں</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onSelect={() => router.push('/contacts')}>
-                <MessageCircle className="h-4 w-4" />
+              <DropdownMenuItem onSelect={() => router.push('/chats/new')}>
+                <MessageCircle className="h-4 w-4 mr-2" />
                 <span>نئی چیٹ</span>
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => router.push('/contacts/add')}>
-                <UserPlus className="h-4 w-4" />
+                <UserPlus className="h-4 w-4 mr-2" />
                 <span>رابطے شامل کریں</span>
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => router.push('/scan')}>
-                <ScanLine className="h-4 w-4" />
+                <ScanLine className="h-4 w-4 mr-2" />
                 <span>اسکین</span>
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => router.push('/money')}>
-                <Landmark className="h-4 w-4" />
+                <Landmark className="h-4 w-4 mr-2" />
                 <span>پیسے</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -103,7 +103,7 @@ export default function MePage() {
         </Card>
         
         <Button variant="destructive" className="w-full" onClick={handleLogout}>
-          <LogOut className="h-4 w-4" />
+          <LogOut className="h-4 w-4 mr-2" />
           کھاتہ خروج
         </Button>
       </div>
