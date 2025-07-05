@@ -157,19 +157,19 @@ export default function ChatsPage() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onSelect={() => router.push('/contacts')}>
-                <MessageCircle className="ml-2 h-4 w-4" />
+                <MessageCircle className="h-4 w-4" />
                 <span>نئی چیٹ</span>
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => router.push('/contacts/add')}>
-                <UserPlus className="ml-2 h-4 w-4" />
+                <UserPlus className="h-4 w-4" />
                 <span>رابطے شامل کریں</span>
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => router.push('/scan')}>
-                <ScanLine className="ml-2 h-4 w-4" />
+                <ScanLine className="h-4 w-4" />
                 <span>اسکین</span>
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => router.push('/money')}>
-                <Landmark className="ml-2 h-4 w-4" />
+                <Landmark className="h-4 w-4" />
                 <span>پیسے</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -178,10 +178,10 @@ export default function ChatsPage() {
       </header>
        <div className="p-4 border-b">
         <div className="relative">
-          <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input 
             placeholder="تلاش کریں" 
-            className="pr-10"
+            className="pl-10"
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
           />

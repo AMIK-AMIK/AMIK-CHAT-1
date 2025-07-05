@@ -80,8 +80,8 @@ export default function QrCodePage() {
                   <AvatarFallback className="text-2xl">{userData.name.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="text-xl font-bold text-right">{userData.name}</p>
-                  <p className="text-muted-foreground text-right">پاکستان</p>
+                  <p className="text-xl font-bold text-left">{userData.name}</p>
+                  <p className="text-muted-foreground text-left">پاکستان</p>
                 </div>
               </div>
 

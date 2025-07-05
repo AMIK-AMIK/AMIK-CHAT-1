@@ -64,12 +64,12 @@ export default function MePage() {
           <CardContent className="p-0">
             <div className="divide-y">
               <Link href="/me/edit" className="flex items-center p-4 transition-colors hover:bg-muted/50">
-                <UserCircle className="ml-4 h-6 w-6 text-accent" />
+                <UserCircle className="h-6 w-6 text-accent mr-4" />
                 <span className="flex-1 font-medium">پروفائل میں ترمیم کریں</span>
                 <ChevronRight className="h-5 w-5 text-muted-foreground" />
               </Link>
               <Link href="/me/settings" className="flex items-center p-4 transition-colors hover:bg-muted/50">
-                <Settings className="ml-4 h-6 w-6 text-accent" />
+                <Settings className="h-6 w-6 text-accent mr-4" />
                 <span className="flex-1 font-medium">ترتیبات</span>
                 <ChevronRight className="h-5 w-5 text-muted-foreground" />
               </Link>
@@ -78,7 +78,7 @@ export default function MePage() {
         </Card>
         
         <Button variant="destructive" className="w-full" onClick={handleLogout}>
-          <LogOut className="ml-2 h-4 w-4" />
+          <LogOut className="h-4 w-4" />
           لاگ آؤٹ
         </Button>
       </div>

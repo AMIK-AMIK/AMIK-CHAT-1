@@ -111,7 +111,7 @@ export default function AccountPage() {
                 />
                 
                 <Button type="submit" disabled={isSubmitting} className="w-full">
-                  {isSubmitting ? <Loader2 className="ml-2 h-4 w-4 animate-spin" /> : null}
+                  {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
                   پاس ورڈ اپ ڈیٹ کریں
                 </Button>
               </form>

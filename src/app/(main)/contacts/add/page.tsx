@@ -118,7 +118,7 @@ export default function AddContactPage() {
             </CardContent>
             <CardFooter>
               <Button type="submit" disabled={loading || !currentUser} className="w-full">
-                {loading ? <Loader2 className="ml-2 h-4 w-4 animate-spin" /> : null}
+                {loading && <Loader2 className="h-4 w-4 animate-spin" />}
                 رابطہ شامل کریں
               </Button>
             </CardFooter>

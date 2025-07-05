@@ -117,7 +117,7 @@ export default function EditProfilePage() {
                       </AvatarFallback>
                     </Avatar>
                   <Button type="button" variant="outline" onClick={generateNewAvatar}>
-                    <RefreshCw className="ml-2 h-4 w-4" />
+                    <RefreshCw className="h-4 w-4" />
                     نیا اوتار بنائیں
                   </Button>
                 </div>
@@ -137,7 +137,7 @@ export default function EditProfilePage() {
                 />
                 
                 <Button type="submit" disabled={isSubmitting} className="w-full">
-                  {isSubmitting ? <Loader2 className="ml-2 h-4 w-4 animate-spin" /> : null}
+                  {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
                   تبدیلیاں محفوظ کریں
                 </Button>
               </form>

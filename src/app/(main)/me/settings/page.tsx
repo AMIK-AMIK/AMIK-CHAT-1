@@ -24,7 +24,7 @@ export default function SettingsPage() {
           <CardContent className="p-0">
             <div className="divide-y">
                <Link href="/me/settings/account" className="flex items-center p-4 transition-colors hover:bg-muted/50">
-                <Shield className="ml-4 h-6 w-6 text-accent" />
+                <Shield className="h-6 w-6 text-accent mr-4" />
                 <div className="flex-1">
                   <p className="font-medium">اکاؤنٹ اور سیکیورٹی</p>
                   <p className="text-sm text-muted-foreground">پاس ورڈ، اکاؤنٹ کی تفصیلات</p>
