@@ -34,7 +34,7 @@ export default function LoginPage() {
     } catch (error: any) {
       toast({
         variant: 'destructive',
-        title: 'لاگ ان ناکام',
+        title: 'داخلہ ناکام',
         description: error.message,
       });
     } finally {
@@ -51,22 +51,22 @@ export default function LoginPage() {
         </div>
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl">لاگ ان</CardTitle>
+            <CardTitle className="text-2xl">داخلہ</CardTitle>
             <CardDescription>اپنے اکاؤنٹ تک رسائی کے لیے اپنی اسناد درج کریں</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">ای میل</Label>
+                <Label htmlFor="email">برقی خط</Label>
                 <Input id="email" name="email" type="email" placeholder="m@example.com" required />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">پاس ورڈ</Label>
+                <Label htmlFor="password">خفیہ کوڈ</Label>
                 <Input id="password" name="password" type="password" required />
               </div>
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-                لاگ ان کریں
+                داخل ہوں
               </Button>
             </form>
             <div className="mt-4 text-center text-sm">

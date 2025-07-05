@@ -34,8 +34,8 @@ export default function SignupPage() {
     if (password.length < 6) {
         toast({
             variant: "destructive",
-            title: "پاس ورڈ بہت چھوٹا ہے",
-            description: "پاس ورڈ کم از کم 6 حروف کا ہونا چاہیے۔",
+            title: "خفیہ کوڈ بہت چھوٹا ہے",
+            description: "خفیہ کوڈ کم از کم 6 حروف کا ہونا چاہیے۔",
         });
         setLoading(false);
         return;
@@ -89,11 +89,11 @@ export default function SignupPage() {
               <Input id="username" name="username" type="text" placeholder="آپ کا نام" required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">ای میل</Label>
+              <Label htmlFor="email">برقی خط</Label>
               <Input id="email" name="email" type="email" placeholder="m@example.com" required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">پاس ورڈ</Label>
+              <Label htmlFor="password">خفیہ کوڈ</Label>
               <Input id="password" name="password" type="password" required />
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
@@ -104,7 +104,7 @@ export default function SignupPage() {
           <div className="mt-4 text-center text-sm">
             پہلے سے اکاؤنٹ ہے؟{" "}
             <Link href="/login" className="underline text-accent">
-              لاگ ان
+              داخل ہوں
             </Link>
           </div>
         </CardContent>
