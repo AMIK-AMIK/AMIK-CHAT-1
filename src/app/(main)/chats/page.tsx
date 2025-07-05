@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -12,33 +13,29 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Search, Plus, MessageCircle, UserPlus, ScanLine, Landmark } from 'lucide-react';
-import { format, formatDistanceToNowStrict } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 
 function formatUrduDistanceToNow(date: Date): string {
     const now = new Date();
     const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
-    if (seconds < 60) {
-        return "ابھی ابھی";
-    }
-
-    const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) {
-        return `${minutes} منٹ پہلے`;
-    }
-
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) {
-        return `${hours} گھنٹے پہلے`;
-    }
-
-    const days = Math.floor(hours / 24);
-    if (days < 30) {
-        return `${days} دن پہلے`;
-    }
+    if (seconds < 2) return "ابھی ابھی";
+    if (seconds < 60) return `${seconds} سیکنڈ پہلے`;
     
-    return format(date, "dd/MM/yyyy");
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes} منٹ پہلے`;
+    
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours} گھنٹے پہلے`;
+    
+    const days = Math.floor(hours / 24);
+    if (days < 30) return `${days} دن پہلے`;
+
+    const months = Math.floor(days / 30);
+    if (months < 12) return `${months} مہینے پہلے`;
+
+    const years = Math.floor(days / 365);
+    return `${years} سال پہلے`;
 }
 
 function ChatItem({ chat, currentUserId }: { chat: Chat; currentUserId: string }) {
@@ -77,13 +74,13 @@ function ChatItem({ chat, currentUserId }: { chat: Chat; currentUserId: string }
 
   return (
     <Link href={`/chats/${chat.id}`} className="block transition-colors hover:bg-muted/50">
-      <div className="flex items-center gap-4 px-4 py-3">
+      <div className="flex items-center gap-4 p-4">
         <Avatar className="h-12 w-12 border">
           <AvatarImage src={otherParticipant.avatarUrl} alt={otherParticipant.name} data-ai-hint="person avatar" />
           <AvatarFallback>{otherParticipant.name.charAt(0)}</AvatarFallback>
         </Avatar>
         <div className="flex-1 overflow-hidden">
-          <div className="flex justify-between items-center">
+          <div className="flex items-center justify-between">
             <p className="font-semibold truncate text-base">{otherParticipant.name}</p>
             {hasMounted && chat.lastMessage && <p className="text-xs text-muted-foreground">{time}</p>}
           </div>
@@ -157,19 +154,19 @@ export default function ChatsPage() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onSelect={() => router.push('/chats/new')}>
-                <MessageCircle className="h-4 w-4 mr-2" />
+                <MessageCircle className="mr-2 h-4 w-4" />
                 <span>نئی چیٹ</span>
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => router.push('/contacts/add')}>
-                <UserPlus className="h-4 w-4 mr-2" />
+                <UserPlus className="mr-2 h-4 w-4" />
                 <span>رابطے شامل کریں</span>
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => router.push('/scan')}>
-                <ScanLine className="h-4 w-4 mr-2" />
+                <ScanLine className="mr-2 h-4 w-4" />
                 <span>اسکین</span>
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => router.push('/money')}>
-                <Landmark className="h-4 w-4 mr-2" />
+                <Landmark className="mr-2 h-4 w-4" />
                 <span>پیسے</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
