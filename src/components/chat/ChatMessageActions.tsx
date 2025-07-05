@@ -6,10 +6,11 @@ import { PopoverContent } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import type { Message } from "@/lib/types";
-import { Copy, Forward, SmilePlus, Languages, Trash, Trash2, Plus } from "lucide-react";
+import { Copy, Forward, Languages, Trash, Trash2, Plus } from "lucide-react";
 
 interface ChatMessageActionsProps {
   message: Message;
+  isTranslated: boolean;
   onDeleteForEveryone: (messageId: string) => void;
   onTranslate: (messageId: string, text: string) => void;
   onForward: (message: Message) => void;
@@ -20,6 +21,7 @@ interface ChatMessageActionsProps {
 
 export default function ChatMessageActions({
   message,
+  isTranslated,
   onDeleteForEveryone,
   onTranslate,
   onForward,
@@ -37,9 +39,7 @@ export default function ChatMessageActions({
 
   const handleActionClick = (action: () => void) => {
     action();
-    // The popover should close automatically after an action if it's a stateless trigger.
-    // We can manage state if needed, but this is simpler for now.
-    document.body.click(); // Hacky way to close popover
+    document.body.click(); 
   };
 
   const actions = [
@@ -56,7 +56,7 @@ export default function ChatMessageActions({
       show: !message.isDeleted,
     },
     {
-      label: "ترجمہ کریں",
+      label: isTranslated ? "ترجمہ منسوخ کریں" : "ترجمہ کریں",
       icon: Languages,
       onClick: () => handleActionClick(() => onTranslate(message.id, message.text)),
       show: !message.isDeleted,

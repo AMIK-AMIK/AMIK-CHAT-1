@@ -104,7 +104,16 @@ export default function ChatView({ chatId }: { chatId: string }) {
     }
   };
 
-  const handleTranslateMessage = async (messageId: string, textToTranslate: string) => {
+  const handleToggleTranslation = async (messageId: string, textToTranslate: string) => {
+    if (translatingId === messageId) return;
+
+    if (translations[messageId]) {
+      const newTranslations = { ...translations };
+      delete newTranslations[messageId];
+      setTranslations(newTranslations);
+      return;
+    }
+
     setTranslatingId(messageId);
     try {
         const result = await translateText({ text: textToTranslate, targetLanguage: 'English' });
@@ -131,7 +140,6 @@ export default function ChatView({ chatId }: { chatId: string }) {
         
         const uidsWithThisReaction = reactions[emoji] || [];
 
-        // Remove user from any other reaction they might have made
         Object.keys(reactions).forEach(key => {
             if (key !== emoji) {
                 reactions[key] = reactions[key]?.filter(uid => uid !== currentUser.uid);
@@ -142,13 +150,11 @@ export default function ChatView({ chatId }: { chatId: string }) {
         });
         
         if (uidsWithThisReaction.includes(currentUser.uid)) {
-            // User is removing their reaction
             reactions[emoji] = uidsWithThisReaction.filter(uid => uid !== currentUser.uid);
             if (reactions[emoji].length === 0) {
                 delete reactions[emoji];
             }
         } else {
-            // User is adding a reaction
             reactions[emoji] = [...uidsWithThisReaction, currentUser.uid];
         }
         
@@ -183,7 +189,6 @@ export default function ChatView({ chatId }: { chatId: string }) {
 
             const timestamp = serverTimestamp();
             
-            // Create a clean message object to forward
             const forwardedMessageData: Partial<Message> = {
                 text: messageToForward.text,
                 senderId: currentUser.uid,
@@ -205,7 +210,7 @@ export default function ChatView({ chatId }: { chatId: string }) {
         
         await batch.commit();
         toast({ title: "کامیابی", description: `پیغام ${selectedContactIds.length} رابطوں کو فارورڈ کر دیا گیا ہے۔` });
-        setMessageToForward(null); // Close dialog
+        setMessageToForward(null);
 
     } catch (error) {
         console.error("Error forwarding message:", error);
@@ -236,9 +241,10 @@ export default function ChatView({ chatId }: { chatId: string }) {
                 key={message.id} 
                 message={message}
                 translation={translations[message.id]}
+                isTranslated={!!translations[message.id]}
                 isTranslating={translatingId === message.id}
                 onCopy={handleCopy}
-                onTranslate={handleTranslateMessage}
+                onTranslate={handleToggleTranslation}
                 onDeleteForEveryone={handleDeleteMessage}
                 onForward={() => setMessageToForward(message)}
                 onReact={handleReactToMessage}
