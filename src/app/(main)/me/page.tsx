@@ -70,7 +70,7 @@ export default function MePage() {
             </Avatar>
             <div className="flex-1">
               <p className="text-xl font-semibold">{userData.name}</p>
-              <p className="text-muted-foreground break-all">AMIK CHAT شناخت: {user.uid}</p>
+              <p className="text-muted-foreground break-all">اے ایم آئی کے شناخت: {user.uid}</p>
             </div>
             <Link href="/qr" className="p-2 rounded-md hover:bg-muted">
               <QrCode className="h-6 w-6 text-muted-foreground" />
