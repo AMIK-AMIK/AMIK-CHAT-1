@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -9,7 +10,7 @@ import remarkGfm from 'remark-gfm';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ChevronLeft, Loader2, Search as SearchIcon, Wand2, Link2 } from 'lucide-react';
+import { ChevronLeft, Loader2, Search as SearchIcon, Wand2, Link2, Globe } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const suggestedQueries = [
@@ -18,6 +19,15 @@ const suggestedQueries = [
     'صحت مند رہنے کے 5 طریقے',
     'ایک دلچسپ لطیفہ سنائیں',
 ];
+
+const LoadingDots = () => (
+    <div className="flex space-x-2 justify-center items-center">
+      <span className="sr-only">لوڈ ہو رہا ہے...</span>
+      <div className="h-4 w-4 bg-primary rounded-full animate-bounce" style={{ animationDelay: '-0.3s' }}></div>
+      <div className="h-4 w-4 bg-primary rounded-full animate-bounce" style={{ animationDelay: '-0.15s' }}></div>
+      <div className="h-4 w-4 bg-primary rounded-full animate-bounce"></div>
+    </div>
+  );
 
 export default function SearchPage() {
   const router = useRouter();
@@ -49,6 +59,19 @@ export default function SearchPage() {
     handleSearch(query);
   }
 
+  const getHostnameFromUrl = (url: string) => {
+    try {
+        // Handle URLs that might not have a protocol
+        if (!/^https?:\/\//i.test(url)) {
+            url = 'https://' + url;
+        }
+        return new URL(url).hostname.replace('www.', '');
+    } catch (e) {
+        // Fallback for malformed URLs
+        return url.split('/')[0] || url;
+    }
+  };
+
   return (
     <div>
       <header className="sticky top-0 z-10 flex items-center gap-4 border-b bg-background p-3">
@@ -73,10 +96,10 @@ export default function SearchPage() {
 
         <div className="min-h-[60vh] flex flex-col">
             {loading && (
-                <div className="flex flex-col items-center justify-center text-muted-foreground pt-16">
-                    <Loader2 className="h-12 w-12 animate-spin mb-4 text-primary" />
+                <div className="flex flex-col items-center justify-center text-muted-foreground pt-16 space-y-4">
+                    <LoadingDots />
                     <p className="text-lg">تلاش کیا جا رہا ہے...</p>
-                    <p className="text-sm">بہترین جواب تیار کیا جا رہا ہے</p>
+                    <p className="text-sm">آپ کے لیے بہترین جواب تیار کیا جا رہا ہے۔</p>
                 </div>
             )}
 
@@ -89,11 +112,11 @@ export default function SearchPage() {
 
             {result && (
               <div className="space-y-8 animate-in fade-in-50">
-                <Card className="shadow-lg border-primary/20">
+                <Card className="shadow-lg border-primary/20 bg-card">
                     <CardHeader>
-                        <CardTitle className="flex items-center gap-3">
-                            <Wand2 className="h-6 w-6 text-primary" />
-                            <span className='text-xl'>جواب</span>
+                        <CardTitle className="flex items-center gap-3 text-primary">
+                            <Wand2 className="h-6 w-6" />
+                            <span className='text-2xl'>اے ایم آئی کے کا جواب</span>
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -105,19 +128,30 @@ export default function SearchPage() {
 
                 {result.sources && result.sources.length > 0 && (
                   <div className="space-y-4">
-                    <h3 className="text-xl font-bold border-b pb-2 mb-4">ویب کے نتائج</h3>
-                    <div className="space-y-6">
+                     <h3 className="text-2xl font-bold border-b pb-2 mb-4 flex items-center gap-2">
+                        <Globe className="h-6 w-6 text-muted-foreground" />
+                        ویب کے نتائج
+                    </h3>
+                    <div className="grid grid-cols-1 gap-4">
                         {result.sources.map((source, index) => (
-                          <div key={index} className="group">
-                            <a href={source.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
-                               <Link2 className="h-4 w-4 text-muted-foreground flex-shrink-0"/>
-                               <p className="text-sm text-muted-foreground truncate">{source.url}</p>
-                            </a>
-                            <a href={source.url} target="_blank" rel="noopener noreferrer">
-                              <h4 className="text-primary text-lg font-medium group-hover:underline">{source.title}</h4>
-                            </a>
-                            <p className="mt-1 text-sm text-card-foreground">{source.snippet}</p>
-                          </div>
+                          <a 
+                            key={index} 
+                            href={source.url} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="block group"
+                          >
+                            <Card className="hover:border-primary/50 hover:shadow-md transition-all duration-300 transform hover:-translate-y-1">
+                              <CardContent className="p-4">
+                                <div className="flex items-center gap-2">
+                                   <Link2 className="h-4 w-4 text-muted-foreground flex-shrink-0"/>
+                                   <p className="text-sm text-green-700 dark:text-green-500 truncate">{getHostnameFromUrl(source.url)}</p>
+                                </div>
+                                <h4 className="text-primary text-lg font-medium group-hover:underline mt-1">{source.title}</h4>
+                                <p className="mt-2 text-sm text-card-foreground/80">{source.snippet}</p>
+                              </CardContent>
+                            </Card>
+                          </a>
                         ))}
                     </div>
                   </div>
