@@ -168,7 +168,7 @@ export default function ChatsPage() {
   return (
     <div>
       <header className="sticky top-0 z-10 flex items-center justify-between border-b bg-background p-4">
-        <h1 className="text-xl font-bold">اے ایم آئی کے چیٹ</h1>
+        <h1 className="text-xl font-bold">AMIK CHAT</h1>
         <div className="flex items-center gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

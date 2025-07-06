@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -75,7 +76,7 @@ export default function SignupPage() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <MessageCircle className="mx-auto h-16 w-16 text-primary" />
-          <h1 className="text-4xl font-bold mt-4">اے ایم آئی کے چیٹ</h1>
+          <h1 className="text-4xl font-bold mt-4">AMIK CHAT</h1>
         </div>
         <Card>
         <CardHeader>

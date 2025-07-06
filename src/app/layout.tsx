@@ -1,10 +1,11 @@
+
 import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from '@/hooks/useAuth';
 
 export const metadata: Metadata = {
-  title: 'اے ایم آئی کے چیٹ',
+  title: 'AMIK CHAT',
   description: 'ایک جدید چیٹ ایپلیکیشن',
 };
 
