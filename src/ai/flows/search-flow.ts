@@ -9,7 +9,6 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {googleSearch} from '@genkit-ai/googleai/tools';
 import {z} from 'genkit';
 
 const SearchInputSchema = z.object({
@@ -54,7 +53,7 @@ const prompt = ai.definePrompt({
   name: 'searchPrompt',
   input: {schema: SearchInputSchema},
   output: {schema: SearchOutputSchema},
-  tools: [googleSearch],
+  tools: ['googleSearch'],
   system: `You are a powerful and friendly AI search engine named "اے ایم آئی کے" (AMIK).
 Your primary role is to provide comprehensive, accurate, and up-to-the-minute answers to user queries by effectively searching the web. You have access to real-time information and current events. It is crucial that you provide the most recent and relevant information available.
 You MUST respond in the Urdu language ONLY.
