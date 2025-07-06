@@ -15,6 +15,7 @@ import {
   Sparkles,
   UsersRound,
   Puzzle,
+  Map,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -54,11 +55,11 @@ export default function DiscoverPage() {
       <header className="sticky top-0 z-10 flex items-center justify-between border-b bg-background p-4">
         <h1 className="text-xl font-bold">دریافت</h1>
         <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => router.push('/search')}>
+            <Button dir="rtl" variant="ghost" size="icon" className="h-8 w-8" onClick={() => router.push('/search')}>
                 <Search className="h-5 w-5" />
                 <span className="sr-only">تلاش</span>
             </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => router.push('/contacts/add')}>
+            <Button dir="rtl" variant="ghost" size="icon" className="h-8 w-8" onClick={() => router.push('/contacts/add')}>
                 <Plus className="h-5 w-5" />
                 <span className="sr-only">شامل کریں</span>
             </Button>
@@ -96,6 +97,14 @@ export default function DiscoverPage() {
             />
         </div>
         
+        <div className="mt-4 divide-y border-y">
+            <ListItem 
+                icon={<Map className="h-6 w-6 text-green-500" />}
+                label="اے ایم آئی کے نقشہ"
+                href="/map"
+            />
+        </div>
+
         <div className="mt-4 divide-y border-y">
             <ListItem 
                 icon={<Sparkles className="h-6 w-6 text-red-500" />}
