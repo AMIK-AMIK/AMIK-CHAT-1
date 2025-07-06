@@ -54,7 +54,7 @@ export default function DiscoverPage() {
       <header className="sticky top-0 z-10 flex items-center justify-between border-b bg-background p-4">
         <h1 className="text-xl font-bold">دریافت</h1>
         <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleComingSoon}>
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => router.push('/search')}>
                 <Search className="h-5 w-5" />
                 <span className="sr-only">تلاش</span>
             </Button>
@@ -91,7 +91,7 @@ export default function DiscoverPage() {
         <div className="mt-4 divide-y border-y">
             <ListItem 
                 icon={<ScanLine className="h-6 w-6 text-sky-500" />}
-                label="اسکین"
+                label="کیو آر اسکین"
                 href="/scan"
             />
         </div>
@@ -100,7 +100,7 @@ export default function DiscoverPage() {
             <ListItem 
                 icon={<Sparkles className="h-6 w-6 text-red-500" />}
                 label="تلاش"
-                href="#"
+                href="/search"
             />
         </div>
         
