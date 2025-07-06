@@ -20,7 +20,7 @@ const SearchOutputSchema = z.object({
   answer: z.string().describe('The detailed, direct answer to the user\'s query, in Urdu.'),
   sources: z.array(z.object({
       title: z.string().describe('The title of the source website, in its original language or Urdu.'),
-      url: z.string().url().describe('The full URL of the source website.'),
+      url: z.string().describe('The full URL of the source website.'),
       snippet: z.string().describe('A short snippet from the source website relevant to the query, in Urdu.'),
     })).describe('A list of at least 3 relevant web sources used to generate the answer. These can be real or plausible-looking hypothetical sources.'),
 });
