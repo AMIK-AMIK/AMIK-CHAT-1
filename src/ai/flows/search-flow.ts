@@ -17,7 +17,7 @@ const SearchInputSchema = z.object({
 export type SearchInput = z.infer<typeof SearchInputSchema>;
 
 const SearchOutputSchema = z.object({
-  answer: z.string().describe('The detailed, direct answer to the user\'s query, in Urdu.'),
+  answer: z.string().describe('The detailed, direct answer to the user\'s query, formatted in Markdown (supporting bold, italics, lists, and emojis), in Urdu.'),
   sources: z.array(z.object({
       title: z.string().describe('The title of the source website, in its original language or Urdu.'),
       url: z.string().describe('The full URL of the source website.'),
@@ -42,7 +42,7 @@ When asked about your identity, who created you, or similar questions, you must 
 Your tone should be helpful, polite, and authoritative.
 
 For each query, you will:
-1.  Provide a direct and detailed answer to the user's question in the 'answer' field.
+1.  Provide a direct and detailed answer to the user's question in the 'answer' field. Format this answer using Markdown. You can use bold, italics, lists, and emojis to make the answer clear and engaging.
 2.  Provide a list of at least 3 relevant, credible web sources in the 'sources' field. For each source, include a title, a full URL, and a relevant snippet.
 
 User's Query: {{{query}}}`,
