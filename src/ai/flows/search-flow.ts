@@ -9,7 +9,7 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {googleSearch} from '@genkit-ai/googleai';
+import {googleSearch} from '@genkit-ai/googleai/tools';
 import {z} from 'genkit';
 
 const SearchInputSchema = z.object({
