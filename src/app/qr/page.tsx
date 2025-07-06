@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useRouter } from 'next/navigation';
@@ -21,13 +22,13 @@ export default function QrCodePage() {
 
   const handleSaveImage = () => {
     if (!qrCodeRef.current) {
-        toast({ variant: 'destructive', title: 'خرابی', description: 'QR کوڈ محفوظ نہیں ہو سکا۔' });
+        toast({ variant: 'destructive', title: 'خرابی', description: 'کیو آر کوڈ محفوظ نہیں ہو سکا۔' });
         return;
     };
 
     const svgElement = qrCodeRef.current.querySelector('svg');
     if (!svgElement) {
-        toast({ variant: 'destructive', title: 'خرابی', description: 'QR کوڈ عنصر نہیں مل سکا۔' });
+        toast({ variant: 'destructive', title: 'خرابی', description: 'کیو آر کوڈ عنصر نہیں مل سکا۔' });
         return;
     }
     
@@ -51,10 +52,10 @@ export default function QrCodePage() {
       downloadLink.href = pngFile;
       downloadLink.click();
 
-      toast({ title: 'کامیابی', description: 'QR کوڈ ڈاؤن لوڈ میں محفوظ ہو گیا۔' });
+      toast({ title: 'کامیابی', description: 'کیو آر کوڈ ڈاؤن لوڈ میں محفوظ ہو گیا۔' });
     };
     img.onerror = () => {
-       toast({ variant: 'destructive', title: 'خرابی', description: 'محفوظ کرنے کے لیے QR کوڈ لوڈ نہیں ہو سکا۔' });
+       toast({ variant: 'destructive', title: 'خرابی', description: 'محفوظ کرنے کے لیے کیو آر کوڈ لوڈ نہیں ہو سکا۔' });
     }
     img.src = `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svgData)))}`;
   };
@@ -65,6 +66,7 @@ export default function QrCodePage() {
         <Button variant="ghost" size="icon" onClick={() => router.back()}>
           <ChevronLeft className="h-6 w-6" />
         </Button>
+        <h1 className="text-lg font-semibold">میرا کیو آر کوڈ</h1>
         <Button variant="ghost" size="icon">
           <MoreHorizontal className="h-6 w-6" />
         </Button>
@@ -98,7 +100,7 @@ export default function QrCodePage() {
                   </div>
               </div>
 
-              <p className="text-muted-foreground">دوست کے طور پر شامل کرنے کے لیے QR کوڈ اسکین کریں</p>
+              <p className="text-muted-foreground">دوست کے طور پر شامل کرنے کے لیے کیو آر کوڈ اسکین کریں</p>
             </>
           ) : (
             <div className="space-y-6 flex flex-col items-center">
@@ -117,7 +119,7 @@ export default function QrCodePage() {
 
         <footer className="w-full max-w-sm pb-4">
           <div className="flex items-center justify-center space-x-2">
-            <Button variant="link" className="text-muted-foreground hover:text-primary px-2" onClick={() => router.push('/scan')}>اسکین</Button>
+            <Button variant="link" className="text-muted-foreground hover:text-primary px-2" onClick={() => router.push('/scan')}>کیو آر اسکین</Button>
             <Separator orientation="vertical" className="h-4" />
             <Button variant="link" className="text-muted-foreground hover:text-primary px-2">اسٹائل تبدیل کریں</Button>
             <Separator orientation="vertical" className="h-4" />

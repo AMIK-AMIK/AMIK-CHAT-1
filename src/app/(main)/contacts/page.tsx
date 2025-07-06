@@ -117,7 +117,7 @@ export default function ContactsPage() {
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => router.push('/scan')}>
                 <ScanLine className="h-4 w-4 mr-2" />
-                <span>اسکین</span>
+                <span>کیو آر اسکین</span>
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => router.push('/money')}>
                 <Landmark className="h-4 w-4 mr-2" />

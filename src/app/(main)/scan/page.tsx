@@ -37,8 +37,8 @@ export default function ScanPage() {
     if (!code.startsWith('amik-chat-user://')) {
         toast({
             variant: 'destructive',
-            title: 'غلط QR کوڈ',
-            description: 'یہ ایک درست AMIK CHAT QR کوڈ نہیں ہے۔',
+            title: 'غلط کیو آر کوڈ',
+            description: 'یہ ایک درست اے ایم آئی کے چیٹ کیو آر کوڈ نہیں ہے۔',
         });
         router.back();
         return;
@@ -60,7 +60,7 @@ export default function ScanPage() {
         const userDoc = await getDoc(userDocRef);
 
         if (!userDoc.exists()) {
-            toast({ variant: 'destructive', title: 'صارف نہیں ملا', description: 'یہ QR کوڈ کسی درست صارف سے منسلک نہیں ہے۔' });
+            toast({ variant: 'destructive', title: 'صارف نہیں ملا', description: 'یہ کیو آر کوڈ کسی درست صارف سے منسلک نہیں ہے۔' });
             router.back();
             return;
         }
@@ -152,7 +152,7 @@ export default function ScanPage() {
         <Button variant="ghost" size="icon" onClick={() => router.back()} className="hover:bg-zinc-800">
           <ChevronLeft className="h-6 w-6" />
         </Button>
-        <h1 className="flex-1 truncate text-lg font-semibold text-center">اسکین</h1>
+        <h1 className="flex-1 truncate text-lg font-semibold text-center">کیو آر اسکین</h1>
         <div className="w-10"></div>
       </header>
       <main className="flex-1 flex flex-col items-center justify-center p-4 relative">
@@ -164,7 +164,7 @@ export default function ScanPage() {
             <Alert variant="destructive" className="bg-transparent border-red-500 text-white">
                 <AlertTitle>کیمرے تک رسائی مسترد</AlertTitle>
                 <AlertDescription>
-                    QR کوڈ اسکین کرنے کے لیے براہ کرم اپنے براؤزر کی ترتیبات میں کیمرے کی اجازت کو فعال کریں۔
+                    کیو آر کوڈ اسکین کرنے کے لیے براہ کرم اپنے براؤزر کی ترتیبات میں کیمرے کی اجازت کو فعال کریں۔
                 </AlertDescription>
             </Alert>
           </div>
@@ -178,7 +178,7 @@ export default function ScanPage() {
         )}
         
         {!isProcessing && <p className="mt-4 text-center text-white">
-          {hasCameraPermission === null ? 'اسکینر شروع ہو رہا ہے...' : isScanning ? 'اسکین کرنے کے لیے فریم کے اندر ایک QR کوڈ رکھیں۔' : 'کیمرے کا انتظار ہے...'}
+          {hasCameraPermission === null ? 'اسکینر شروع ہو رہا ہے...' : isScanning ? 'اسکین کرنے کے لیے فریم کے اندر ایک کیو آر کوڈ رکھیں۔' : 'کیمرے کا انتظار ہے...'}
         </p>}
       </main>
     </div>
