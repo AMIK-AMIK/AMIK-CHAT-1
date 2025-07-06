@@ -84,10 +84,11 @@ export default function SearchPage() {
       <div className="p-4 space-y-6">
         <form onSubmit={handleFormSubmit} className="flex items-center gap-2">
           <Input 
+            dir="rtl"
             placeholder="کچھ بھی تلاش کریں..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="text-base h-11"
+            className="text-base h-11 text-right"
           />
           <Button type="submit" size="icon" className="h-11 w-11" disabled={loading}>
             {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <SearchIcon className="h-5 w-5" />}
@@ -120,7 +121,7 @@ export default function SearchPage() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-base space-y-4 [&_p]:leading-relaxed [&_ul]:list-disc [&_ul]:pl-6 [&_li]:mb-1 [&_strong]:font-semibold">
+                        <div dir="rtl" className="text-right text-base space-y-4 [&_p]:leading-relaxed [&_ul]:list-disc [&_ul]:pr-6 [&_ul]:pl-0 [&_li]:mb-1 [&_strong]:font-semibold">
                             <ReactMarkdown remarkPlugins={[remarkGfm]}>{result.answer}</ReactMarkdown>
                         </div>
                     </CardContent>
@@ -147,8 +148,8 @@ export default function SearchPage() {
                                    <Link2 className="h-4 w-4 text-muted-foreground flex-shrink-0"/>
                                    <p className="text-sm text-green-700 dark:text-green-500 truncate">{getHostnameFromUrl(source.url)}</p>
                                 </div>
-                                <h4 className="text-primary text-lg font-medium group-hover:underline mt-1">{source.title}</h4>
-                                <p className="mt-2 text-sm text-card-foreground/80">{source.snippet}</p>
+                                <h4 dir="rtl" className="text-right text-primary text-lg font-medium group-hover:underline mt-1">{source.title}</h4>
+                                <p dir="rtl" className="text-right mt-2 text-sm text-card-foreground/80">{source.snippet}</p>
                               </CardContent>
                             </Card>
                           </a>
