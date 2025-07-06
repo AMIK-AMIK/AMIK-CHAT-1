@@ -91,7 +91,7 @@ export default function SearchPage() {
                  <div className="text-center text-muted-foreground">
                     <SearchIcon className="h-16 w-16 mx-auto mb-4" />
                     <h2 className="text-xl font-semibold">کچھ بھی پوچھیں</h2>
-                    <p>اپنا سوال اوپر درج کریں اور AI سے فوری جواب حاصل کریں۔</p>
+                    <p>اپنا سوال اوپر درج کریں اور مصنوعی ذہانت سے فوری جواب حاصل کریں۔</p>
                 </div>
             )}
         </div>
