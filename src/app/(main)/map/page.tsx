@@ -59,18 +59,19 @@ export default function MapPage() {
     const [error, setError] = useState<string | null>(null);
     const { toast } = useToast();
 
+    // Create a custom icon instance to avoid global state issues.
+    const myIcon = L.icon({
+        iconUrl: markerIcon.src,
+        iconRetinaUrl: markerIcon2x.src,
+        shadowUrl: markerShadow.src,
+        iconSize:    [25, 41],
+        iconAnchor:  [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize:  [41, 41]
+    });
+
     useEffect(() => {
         if (mapContainerRef.current && !mapInstanceRef.current) {
-            // Set up default icon paths using imported images
-            // @ts-ignore
-            delete L.Icon.Default.prototype._getIconUrl;
-
-            L.Icon.Default.mergeOptions({
-                iconRetinaUrl: markerIcon2x.src,
-                iconUrl: markerIcon.src,
-                shadowUrl: markerShadow.src,
-            });
-
             const map = L.map(mapContainerRef.current, {
                 center: [30.3753, 69.3451], // Centered on Pakistan
                 zoom: 5,
@@ -147,8 +148,8 @@ export default function MapPage() {
             
             routeLayerRef.current?.addLayer(routeLine);
             
-            L.marker(userLatLng).addTo(markerLayerRef.current!).bindPopup("آپ کا مقام").openPopup();
-            L.marker(destination).addTo(markerLayerRef.current!).bindPopup("منزل").openPopup();
+            L.marker(userLatLng, { icon: myIcon }).addTo(markerLayerRef.current!).bindPopup("آپ کا مقام").openPopup();
+            L.marker(destination, { icon: myIcon }).addTo(markerLayerRef.current!).bindPopup("منزل").openPopup();
             
             mapInstanceRef.current?.fitBounds(routeLine.getBounds());
           } catch (err) {
