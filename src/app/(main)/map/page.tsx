@@ -15,7 +15,14 @@ import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 
+// This is the standard fix for the Leaflet + Next.js/Webpack icon issue.
 delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+    iconRetinaUrl: markerIcon2x.src,
+    iconUrl: markerIcon.src,
+    shadowUrl: markerShadow.src,
+});
+
 
 interface SearchResult {
     place_id: number;
@@ -58,16 +65,6 @@ export default function MapPage() {
     const [loadingRoute, setLoadingRoute] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const { toast } = useToast();
-
-    const customMarkerIcon = L.icon({
-        iconRetinaUrl: markerIcon2x.src,
-        iconUrl: markerIcon.src,
-        shadowUrl: markerShadow.src,
-        iconSize:    [25, 41],
-        iconAnchor:  [12, 41],
-        popupAnchor: [1, -34],
-        shadowSize:  [41, 41]
-    });
 
     useEffect(() => {
         if (mapContainerRef.current && !mapInstanceRef.current) {
@@ -146,8 +143,8 @@ export default function MapPage() {
             
             routeLayerRef.current?.addLayer(routeLine);
             
-            L.marker(userLatLng, { icon: customMarkerIcon }).addTo(markerLayerRef.current!).bindPopup("آپ کا مقام").openPopup();
-            L.marker(destination, { icon: customMarkerIcon }).addTo(markerLayerRef.current!).bindPopup("منزل").openPopup();
+            L.marker(userLatLng).addTo(markerLayerRef.current!).bindPopup("آپ کا مقام").openPopup();
+            L.marker(destination).addTo(markerLayerRef.current!).bindPopup("منزل").openPopup();
             
             mapInstanceRef.current?.fitBounds(routeLine.getBounds());
           } catch (err) {
