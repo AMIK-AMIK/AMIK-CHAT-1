@@ -11,7 +11,6 @@ import { useToast } from '@/hooks/use-toast';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
-// Import marker icons for Leaflet
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
@@ -30,7 +29,6 @@ interface SearchResult {
     }
 }
 
-// OSRM API response structure
 interface RouteGeometry {
     coordinates: [number, number][];
     type: 'LineString';
@@ -59,18 +57,21 @@ export default function MapPage() {
     const [error, setError] = useState<string | null>(null);
     const { toast } = useToast();
 
-    // Create a custom icon instance to avoid global state issues.
-    const myIcon = L.icon({
-        iconUrl: markerIcon.src,
-        iconRetinaUrl: markerIcon2x.src,
-        shadowUrl: markerShadow.src,
-        iconSize:    [25, 41],
-        iconAnchor:  [12, 41],
-        popupAnchor: [1, -34],
-        shadowSize:  [41, 41]
-    });
-
     useEffect(() => {
+        // This is a known workaround for a bug in Leaflet when used with Webpack
+        // It ensures that the icon paths are correctly set.
+        delete (L.Icon.Default.prototype as any)._getIconUrl;
+
+        L.Icon.Default.mergeOptions({
+            iconRetinaUrl: markerIcon2x.src,
+            iconUrl: markerIcon.src,
+            shadowUrl: markerShadow.src,
+            iconSize:    [25, 41],
+            iconAnchor:  [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize:  [41, 41]
+        });
+        
         if (mapContainerRef.current && !mapInstanceRef.current) {
             const map = L.map(mapContainerRef.current, {
                 center: [30.3753, 69.3451], // Centered on Pakistan
@@ -131,7 +132,6 @@ export default function MapPage() {
         async (position) => {
           const userLatLng = L.latLng(position.coords.latitude, position.coords.longitude);
 
-          // OSRM expects {lon},{lat}
           const start = `${userLatLng.lng},${userLatLng.lat}`;
           const end = `${destination.lng},${destination.lat}`;
           
@@ -148,8 +148,8 @@ export default function MapPage() {
             
             routeLayerRef.current?.addLayer(routeLine);
             
-            L.marker(userLatLng, { icon: myIcon }).addTo(markerLayerRef.current!).bindPopup("آپ کا مقام").openPopup();
-            L.marker(destination, { icon: myIcon }).addTo(markerLayerRef.current!).bindPopup("منزل").openPopup();
+            L.marker(userLatLng).addTo(markerLayerRef.current!).bindPopup("آپ کا مقام").openPopup();
+            L.marker(destination).addTo(markerLayerRef.current!).bindPopup("منزل").openPopup();
             
             mapInstanceRef.current?.fitBounds(routeLine.getBounds());
           } catch (err) {
