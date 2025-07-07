@@ -40,21 +40,19 @@ export default function MapPage() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const DefaultIcon = L.icon({
-          iconRetinaUrl: iconRetina.src,
-          iconUrl: icon.src,
-          shadowUrl: iconShadow.src,
-          iconSize: [25, 41],
-          iconAnchor: [12, 41],
-          popupAnchor: [1, -34],
-          tooltipAnchor: [16, -28],
-          shadowSize: [41, 41],
-        });
-        L.Marker.prototype.options.icon = DefaultIcon;
-    }, []);
-
-    useEffect(() => {
         if (mapContainerRef.current && !mapInstanceRef.current) {
+            const DefaultIcon = L.icon({
+              iconRetinaUrl: iconRetina.src,
+              iconUrl: icon.src,
+              shadowUrl: iconShadow.src,
+              iconSize: [25, 41],
+              iconAnchor: [12, 41],
+              popupAnchor: [1, -34],
+              tooltipAnchor: [16, -28],
+              shadowSize: [41, 41],
+            });
+            L.Marker.prototype.options.icon = DefaultIcon;
+
             const map = L.map(mapContainerRef.current, {
                 center: [30.3753, 69.3451],
                 zoom: 5,
