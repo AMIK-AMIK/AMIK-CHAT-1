@@ -11,6 +11,11 @@ import { useToast } from '@/hooks/use-toast';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
+// Import marker icons for Leaflet
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+
 interface SearchResult {
     place_id: number;
     lat: string;
@@ -56,19 +61,15 @@ export default function MapPage() {
 
     useEffect(() => {
         if (mapContainerRef.current && !mapInstanceRef.current) {
-            // Set up default icon paths
-            try {
-                // @ts-ignore
-                delete L.Icon.Default.prototype._getIconUrl;
-                L.Icon.Default.mergeOptions({
-                    iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png').default,
-                    iconUrl: require('leaflet/dist/images/marker-icon.png').default,
-                    shadowUrl: require('leaflet/dist/images/marker-shadow.png').default,
-                });
-            } catch (e) {
-                console.error("Could not set up Leaflet default icons", e);
-            }
+            // Set up default icon paths using imported images
+            // @ts-ignore
+            delete L.Icon.Default.prototype._getIconUrl;
 
+            L.Icon.Default.mergeOptions({
+                iconRetinaUrl: markerIcon2x.src,
+                iconUrl: markerIcon.src,
+                shadowUrl: markerShadow.src,
+            });
 
             const map = L.map(mapContainerRef.current, {
                 center: [30.3753, 69.3451], // Centered on Pakistan
