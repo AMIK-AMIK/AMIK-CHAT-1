@@ -4,13 +4,17 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from '@/hooks/useAuth';
 
+const APP_LOGO_URL = "https://storage.googleapis.com/project-123-files/user-upload-5f6962ce-4b8c-4467-9c98-132da9700305.png";
+
 export const metadata: Metadata = {
   title: 'اے ایم آئی کے چیٹ',
   description: 'ایک جدید چیٹ ایپلیکیشن',
   manifest: '/manifest.json',
   themeColor: '#05c765',
   icons: {
-    apple: "/icons/icon-192x192.png",
+    icon: APP_LOGO_URL,
+    shortcut: APP_LOGO_URL,
+    apple: APP_LOGO_URL,
   },
 };
 
@@ -22,7 +26,6 @@ export default function RootLayout({
   return (
     <html lang="ur" dir="ltr" suppressHydrationWarning={true}>
       <head>
-        <link rel="apple-touch-icon" href="/icons/icon-192x192.png"></link>
       </head>
       <body className="font-body antialiased" suppressHydrationWarning={true}>
         <AuthProvider>
