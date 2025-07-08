@@ -1,7 +1,11 @@
 {
-  "name": "اے ایم آئی کے چیٹ",
+  "name": "AMIK CHAT",
   "short_name": "AMIK CHAT",
   "description": "ایک جدید چیٹ ایپلیکیشن",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f0f0f",
+  "theme_color": "#05c765",
   "icons": [
     {
       "src": "/icons/icon-192x192.png",
@@ -15,12 +19,5 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ],
-  "theme_color": "#05c765",
-  "background_color": "#ffffff",
-  "start_url": "/",
-  "display": "standalone",
-  "orientation": "portrait",
-  "dir": "ltr",
-  "lang": "ur"
+  ]
 }
