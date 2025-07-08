@@ -1,7 +1,7 @@
 "use client";
 
 import Link from 'next/link';
-import { useEffect, useState, use } from 'react';
+import { useEffect, useState } from 'react';
 import { ChevronLeft, MoreHorizontal } from 'lucide-react';
 import ChatView from '@/components/chat/ChatView';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -11,7 +11,11 @@ import { db } from '@/lib/firebase';
 import type { User } from '@/lib/types';
 import { useAuth } from '@/hooks/useAuth';
 
-export default function ChatPage({ params }: { params: { id: string } }) {
+interface ChatPageProps {
+  params: { id: string };
+}
+
+export default function ChatPage({ params }: ChatPageProps) {
   const { id } = params;
   const [otherParticipant, setOtherParticipant] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
