@@ -8,12 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, MessageCircle } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { useAuth } from "@/hooks/useAuth";
+import Image from 'next/image';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -91,7 +92,14 @@ export default function SignupPage() {
     <div className="flex min-h-screen w-full items-center justify-center bg-background p-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <MessageCircle className="mx-auto h-16 w-16 text-primary" />
+          <Image 
+            src="https://placehold.co/256x256.png"
+            alt="AMIK CHAT Logo" 
+            width={64} 
+            height={64} 
+            className="mx-auto" 
+            data-ai-hint="logo chat bubble"
+          />
           <h1 className="text-4xl font-bold mt-4">AMIK CHAT</h1>
         </div>
         <Card>

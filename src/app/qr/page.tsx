@@ -5,12 +5,13 @@ import { useRouter } from 'next/navigation';
 import { useRef } from 'react';
 import QRCode from 'react-qr-code';
 import { useAuth } from '@/hooks/useAuth';
-import { ChevronLeft, MoreHorizontal, MessageCircle } from 'lucide-react';
+import { ChevronLeft, MoreHorizontal } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
+import Image from 'next/image';
 
 export default function QrCodePage() {
   const router = useRouter();
@@ -96,7 +97,13 @@ export default function QrCodePage() {
                     level="H"
                   />
                   <div className="absolute top-1/2 left-1/2 h-16 w-16 -translate-x-1/2 -translate-y-1/2 bg-white p-1 flex items-center justify-center rounded-md border shadow-md">
-                    <MessageCircle className="h-10 w-10 text-primary" />
+                     <Image
+                        src="https://placehold.co/256x256.png"
+                        alt="AMIK Logo"
+                        width={48}
+                        height={48}
+                        data-ai-hint="logo chat bubble"
+                    />
                   </div>
               </div>
 
