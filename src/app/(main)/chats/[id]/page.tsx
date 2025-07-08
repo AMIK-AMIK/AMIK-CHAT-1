@@ -11,11 +11,7 @@ import { db } from '@/lib/firebase';
 import type { User } from '@/lib/types';
 import { useAuth } from '@/hooks/useAuth';
 
-interface ChatPageProps {
-  params: { id: string };
-}
-
-export default function ChatPage({ params }: ChatPageProps) {
+export default function ChatPage({ params }: { params: { id: string } }) {
   const { id } = params;
   const [otherParticipant, setOtherParticipant] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
